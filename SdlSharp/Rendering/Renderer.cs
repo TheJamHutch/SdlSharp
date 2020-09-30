@@ -10,6 +10,7 @@ namespace SdlSharp
         public Renderer(Window window)
         {
             Pointer = SDL.SDL_CreateRenderer(window.Pointer, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
+            Global.RendererPointer = Pointer;
         }
 
         void IDisposable.Dispose() 

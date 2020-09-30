@@ -1,6 +1,5 @@
 ﻿using System;
 using SdlSharp;
-using SDL2;
 
 namespace SdlSharp_App
 {
@@ -22,10 +21,12 @@ namespace SdlSharp_App
 
     class Program
     {
+        private static Rect _dstRect = new Rect(0, 0, 32, 32);
+
         static void Render(Renderer renderer, Texture texture) 
         {
             renderer.Clear();
-            renderer.Copy(texture, new Rect(0, 0, 32, 32), new Rect(100, 50, 32, 32));
+            renderer.Copy(texture, new Rect(0, 0, 32, 32), _dstRect);
             renderer.Present();
         }
 
@@ -33,18 +34,23 @@ namespace SdlSharp_App
         {
             using (var sdlSystem = new SdlSystem())
             {
+                Console.WriteLine("Initialized " + sdlSystem.GetVersion());
+
                 using (var window = new Window("SdlSharp Test", 640, 480))
                 {
                     using (var renderer = new Renderer(window))
                     {
                         bool quit = false;
 
-                        var tex = new Texture(renderer, "./img/testimg.bmp");
+                        var tex = new Texture("./img/testimg.bmp", ColourType.Magenta);
 
-                        Eventing.RegisterKeypressAction(KeyType.Key_0, () => Console.WriteLine("Default"));
-                        Eventing.RegisterKeypressAction(KeyType.Key_1, () => Console.WriteLine("Eeeexcellent"));
+                        Action movePlayer = () => { _dstRect.X += 2; };
+
+                        Eventing.RegisterKeypressAction(KeyType.Key_0, () => {});
+                        Eventing.RegisterKeypressAction(KeyType.Key_1, movePlayer);
                         Eventing.RegisterKeypressAction(KeyType.Key_LCtrl, () => Console.WriteLine("Left ctrl"));
                         Eventing.RegisterKeypressAction(KeyType.Key_RCtrl, () => Console.WriteLine("Right ctrl"));
+                        Eventing.RegisterKeypressAction(KeyType.Key_w, movePlayer);
 
                         while (!quit)
                         {

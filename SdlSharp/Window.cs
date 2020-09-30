@@ -10,6 +10,7 @@ namespace SdlSharp
         public Window(string title, int width, int height)
         {
             Pointer = SDL.SDL_CreateWindow(title, 100, 100, width, height, 0);
+            Global.WindowPointer = Pointer;
         }
 
         void IDisposable.Dispose() 
