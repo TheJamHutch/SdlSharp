@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SdlSharp\SdlSharp.csproj" />
+    <ProjectReference Include="..\SdlSharpened\SdlSharpened.csproj" />
   </ItemGroup>
 
 </Project>

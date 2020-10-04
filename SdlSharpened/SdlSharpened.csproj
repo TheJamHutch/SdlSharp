@@ -16,7 +16,7 @@
 	  <PackageTags>sdl2</PackageTags>
 	  <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
 	  <RepositoryType>git</RepositoryType>
-	  <RepositoryUrl>https://github.com/TheJamHutch/SdlSharp</RepositoryUrl>
+	  <RepositoryUrl>https://github.com/TheJamHutch/SdlSharpened</RepositoryUrl>
 	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 </Project>

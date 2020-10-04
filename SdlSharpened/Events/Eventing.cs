@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using SDL2;
 
-namespace SdlSharp
+namespace SdlSharpened
 {
     public static class Eventing
     {

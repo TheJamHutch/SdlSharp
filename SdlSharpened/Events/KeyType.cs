@@ -1,6 +1,6 @@
 ﻿using SDL2;
 
-namespace SdlSharp
+namespace SdlSharpened
 {
     public enum KeyType
     {

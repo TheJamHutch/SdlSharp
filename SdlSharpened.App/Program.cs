@@ -1,8 +1,8 @@
 ﻿using System;
-using SdlSharp;
-using SdlSharp.App;
+using SdlSharpened;
+using SdlSharpened.App;
 
-namespace SdlSharp.App
+namespace SdlSharpened.App
 {
     class Program
     {

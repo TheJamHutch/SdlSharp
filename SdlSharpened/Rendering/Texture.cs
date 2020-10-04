@@ -1,7 +1,7 @@
 ﻿using System;
 using SDL2;
 
-namespace SdlSharp
+namespace SdlSharpened
 {
     public class Texture
     {

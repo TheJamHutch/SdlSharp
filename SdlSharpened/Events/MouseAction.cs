@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SdlSharp
+namespace SdlSharpened
 {
     public static class MouseAction
     {
