@@ -43,5 +43,41 @@ namespace SdlSharp
 
             return sdlColour;
         }
+
+        public static void SetFromBytes(this ColourType colour, byte r, byte g, byte b)
+        {
+            if (r == 0 && g == 0 && b == 0)
+            {
+                colour = ColourType.Black;
+            }
+            else if (r == 0xff && g == 0 && b == 0)
+            {
+                colour = ColourType.Red;
+            }
+            else if (r == 0 && g == 0xff && b == 0)
+            {
+                colour = ColourType.Green;
+            }
+            else if (r == 0 && g == 0 && b == 0xff)
+            {
+                colour = ColourType.Blue;
+            }
+            else if (r == 0 && g == 0xff && b == 0xff)
+            {
+                colour = ColourType.Cyan;
+            }
+            else if (r == 0xff && g == 0 && b == 0xff)
+            {
+                colour = ColourType.Magenta;
+            }
+            else if (r == 0xff && g == 0xff && b == 0)
+            {
+                colour = ColourType.Yellow;
+            }
+            else
+            {
+                colour = ColourType.Black;
+            }
+        }
     }
 }

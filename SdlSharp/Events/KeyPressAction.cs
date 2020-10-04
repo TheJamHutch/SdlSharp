@@ -6,11 +6,11 @@ namespace SdlSharp
     {
         private static readonly Action _noop = (() => { });
 
-        public Action? DownAction { get; set; }
+        public Action DownAction { get; set; }
 
-        public Action? UpAction { get; set; }
+        public Action UpAction { get; set; }
 
-        public KeyPressAction(Action? downAction, Action? upAction)
+        public KeyPressAction(Action downAction, Action upAction)
         {
             DownAction = downAction ?? _noop;
             UpAction = upAction ?? _noop;

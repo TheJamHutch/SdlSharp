@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SdlSharp.App", "SdlSharp_App\SdlSharp.App.csproj", "{C966624D-B398-4F0E-94BD-CED3CEC95F99}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SdlSharp.App", "SdlSharp.App\SdlSharp.App.csproj", "{C966624D-B398-4F0E-94BD-CED3CEC95F99}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SdlSharp", "SdlSharp\SdlSharp.csproj", "{0D1D9E5E-DF14-46B1-9F6F-D1113751B8B9}"
 EndProject

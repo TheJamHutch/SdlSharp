@@ -4,5 +4,19 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
 	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-
+	
+  <!--NuGet Package Information-->
+  <PropertyGroup>
+	  <PackageId>SdlSharpened</PackageId>
+	  <Title>SdlSharpened</Title>
+	  <PackageReleaseNotes>Layer over SDL2-CS.</PackageReleaseNotes>
+	  <Version>0.1.0</Version>
+	  <Authors>TheJamHutch</Authors>
+	  <Company>Some Company</Company>
+	  <PackageTags>sdl2</PackageTags>
+	  <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+	  <RepositoryType>git</RepositoryType>
+	  <RepositoryUrl>https://github.com/TheJamHutch/SdlSharp</RepositoryUrl>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
 </Project>

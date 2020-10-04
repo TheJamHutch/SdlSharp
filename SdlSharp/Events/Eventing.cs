@@ -10,9 +10,24 @@ namespace SdlSharp
 
         private static Dictionary<KeyType, KeyPressAction> _keypressRegistry = new Dictionary<KeyType, KeyPressAction>();
 
-        public static void OnKeypress(KeyType key, Action downAction, Action? upAction = null) 
+        public static void OnKeypress(KeyType key, Action downAction, Action upAction = null) 
         {
             _keypressRegistry[key] = new KeyPressAction(downAction, upAction);
+        }
+
+        public static void OnMouseMove(Action<int, int> action) 
+        {
+            MouseAction.Move = action;
+        }
+
+        public static void OnMouseButtonDown(Action<int, int> action) 
+        {
+            MouseAction.ButtonDown = action;
+        }
+
+        public static void OnMouseButtonUp(Action<int, int> action) 
+        {
+            MouseAction.ButtonUp = action;
         }
 
         public static int PollEvents()
@@ -27,21 +42,14 @@ namespace SdlSharp
                 {
                     SDL.SDL_Keycode sdlKey = _event.key.keysym.sym;
 
-                    if (sdlKey == SDL.SDL_Keycode.SDLK_ESCAPE)
+                    KeyType key = KeyTypeExtension.MapSdlKeycode(sdlKey);
+                    if (_keypressRegistry.TryGetValue(key, out var toPerform))
                     {
-                        return 0;
+                        toPerform.DownAction.Invoke();
                     }
                     else
                     {
-                        KeyType key = KeyTypeExtension.MapSdlKeycode(sdlKey);
-                        if (_keypressRegistry.TryGetValue(key, out var toPerform))
-                        {
-                            toPerform.DownAction.Invoke();
-                        }
-                        else
-                        {
-                            Console.WriteLine("You must bind this key to an action in order to use it.");
-                        }
+                        Console.WriteLine("You must bind this key to an action in order to use it.");
                     }
                 }
                 else if (_event.type == SDL.SDL_EventType.SDL_KEYUP)
@@ -57,6 +65,18 @@ namespace SdlSharp
                     {
                         Console.WriteLine("You must bind this key to an action in order to use it.");
                     }
+                }
+                else if (_event.type == SDL.SDL_EventType.SDL_MOUSEMOTION)
+                {
+                    MouseAction.Move?.Invoke(_event.button.x, _event.button.y);
+                }
+                else if (_event.type == SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN)
+                {
+                    MouseAction.ButtonDown?.Invoke(_event.button.x, _event.button.y);
+                }
+                else if (_event.type == SDL.SDL_EventType.SDL_MOUSEBUTTONUP)
+                {
+                    MouseAction.ButtonUp?.Invoke(_event.button.x, _event.button.y);
                 }
             }
 

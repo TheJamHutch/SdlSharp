@@ -10,7 +10,8 @@ namespace SdlSharp.App
         {
             Game game = new Game();
 
-            game.Run();
+            // Blocking
+            game.Start();
         }
     }
 }

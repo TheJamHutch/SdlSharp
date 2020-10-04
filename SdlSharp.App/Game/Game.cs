@@ -28,12 +28,17 @@ namespace SdlSharp.App
             _srcRect = new Rect(0, 0, 32, 32);
             _dstRect = new Rect(100, 100, 32, 32);
 
+            Eventing.OnKeypress(KeyType.Key_X, () => { Stop(); });
             Eventing.OnKeypress(KeyType.Key_W, () => { yv = -2; }, () => { yv = 0; });
             Eventing.OnKeypress(KeyType.Key_S, () => { yv = 2; }, () => { yv = 0; });
             Eventing.OnKeypress(KeyType.Key_A, () => { xv = -2; }, () => { xv = 0; });
             Eventing.OnKeypress(KeyType.Key_D, () => { xv = 2; }, () => { xv = 0; });
 
-            _renderer.SetRenderColour(ColourType.Black);
+            Eventing.OnMouseMove((x, y) => { Console.WriteLine($"{x}, {y}"); });
+            Eventing.OnMouseButtonDown((x, y) => { Console.WriteLine($"Clicked at: {x}, {y}"); });
+            Eventing.OnMouseButtonUp((x, y) => { Console.WriteLine($"Unclicked at: {x}, {y}"); });
+
+            _renderer.SetDrawColour(ColourType.Black);
         }
 
         public void Update() 
@@ -45,10 +50,32 @@ namespace SdlSharp.App
         {
             _renderer.Clear();
             _renderer.Copy(_texture, _srcRect, _dstRect);
+            _renderer.SetDrawColour(ColourType.Yellow);
+            _renderer.DrawRect(_dstRect);
+            _renderer.FillRect(new Rect(400, 200, 50, 50), ColourType.Magenta);
+
+            _renderer.SetDrawColour(ColourType.Blue);
+            _renderer.DrawRect(new Rect(50, 300, 20, 50));
             _renderer.Present();
         }
 
-        public void Run()
+        public void Start() 
+        {
+            Run();
+        }
+
+        public void Pause() 
+        {
+            _running = false;
+        }
+
+        public void Stop() 
+        {
+            Console.WriteLine("Stopping Game...");
+            _running = false;
+        }
+
+        private void Run()
         {
             _running = true;
 
