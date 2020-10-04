@@ -3,7 +3,7 @@ using SDL2;
 
 namespace SdlSharp
 {
-    public class Window : IDisposable
+    public class Window
     {
         public IntPtr Pointer { get; }
 
@@ -13,7 +13,7 @@ namespace SdlSharp
             Global.WindowPointer = Pointer;
         }
 
-        void IDisposable.Dispose() 
+        ~Window()
         {
             SDL.SDL_DestroyWindow(Pointer);
         }

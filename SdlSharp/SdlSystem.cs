@@ -3,14 +3,14 @@ using SDL2;
 
 namespace SdlSharp
 {
-    public class SdlSystem : IDisposable
+    public class SdlSystem
     {
         public SdlSystem()
         {
             SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING);
         }
 
-        void IDisposable.Dispose()
+        ~SdlSystem()
         {
             SDL.SDL_Quit();
         }

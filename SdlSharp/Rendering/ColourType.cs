@@ -17,15 +17,8 @@ namespace SdlSharp
 
     public static class Extension 
     {
-        /// <summary>
-        ///   Maps the ColourType to an SDL Uint32 colour key.
-        /// </summary>
-        /// <param name="colour"></param>
-        /// <returns></returns>
-        public static UInt32 ColourKey(this ColourType colour) 
+        public static void ColourBytes(this ColourType colour, out byte r, out byte g, out byte b)
         {
-            byte r = 0, g = 0, b = 0;
-
             switch (colour)
             {
                 case ColourType.Black: { r = 0; g = 0; b = 0; } break;
@@ -36,7 +29,13 @@ namespace SdlSharp
                 case ColourType.Magenta: { r = 0xff; g = 0; b = 0xff; } break;
                 case ColourType.Yellow: { r = 0xff; g = 0xff; b = 0; } break;
                 case ColourType.White: { r = 0xff; g = 0xff; b = 0xff; } break;
+                default: { r = 0; g = 0; b = 0; } break;
             }
+        }
+
+        public static UInt32 ColourKey(this ColourType colour) 
+        {
+            ColourBytes(colour, out var r, out var g, out var b);
 
             var pixelFormat = SDL.SDL_GetWindowPixelFormat(Global.WindowPointer);
             var pixelStruct = SDL.SDL_AllocFormat(pixelFormat);

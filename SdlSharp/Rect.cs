@@ -13,20 +13,20 @@ namespace SdlSharp
 
         public int Y
         {
-            get { return _rect.x; }
-            set { _rect.x = value; }
+            get { return _rect.y; }
+            set { _rect.y = value; }
         }
 
         public int W
         {
-            get { return _rect.x; }
-            set { _rect.x = value; }
+            get { return _rect.w; }
+            set { _rect.w = value; }
         }
 
         public int H
         {
-            get { return _rect.x; }
-            set { _rect.x = value; }
+            get { return _rect.h; }
+            set { _rect.h = value; }
         }
 
         private SDL.SDL_Rect _rect;

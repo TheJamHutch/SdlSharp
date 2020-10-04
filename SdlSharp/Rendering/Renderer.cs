@@ -3,19 +3,26 @@ using SDL2;
 
 namespace SdlSharp
 {
-    public class Renderer : IDisposable
+    public class Renderer
     {
         public IntPtr Pointer { get; }
 
-        public Renderer(Window window)
+        public Renderer()
         {
-            Pointer = SDL.SDL_CreateRenderer(window.Pointer, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
+            Pointer = SDL.SDL_CreateRenderer(Global.WindowPointer, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
             Global.RendererPointer = Pointer;
         }
 
-        void IDisposable.Dispose() 
+        ~Renderer() 
         {
             SDL.SDL_DestroyRenderer(Pointer);
+        }
+
+        public void SetRenderColour(ColourType colour) 
+        {
+            colour.ColourBytes(out var r, out var g, out var b);
+
+            SDL.SDL_SetRenderDrawColor(Pointer, r, g, b, 0xff);
         }
 
         public void Clear() 

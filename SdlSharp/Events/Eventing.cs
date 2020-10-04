@@ -6,48 +6,22 @@ namespace SdlSharp
 {
     public static class Eventing
     {
-        /// <summary>
-        ///   Enum representing the range of possible event types.
-        /// </summary>
-        public enum EventType
-        {
-            Quit = 0,
-            Other
-        }
-
-        /// <summary>
-        ///   SDL's internal SDL_Event structure.
-        /// </summary>
         private static SDL.SDL_Event _event = new SDL.SDL_Event();
 
-        /// <summary>
-        ///   The keypress registry, which associates a particular key code with an action to be performed.
-        /// </summary>
-        private static Dictionary<KeyType, Action> _keypressRegistry = new Dictionary<KeyType, Action>();
+        private static Dictionary<KeyType, KeyPressAction> _keypressRegistry = new Dictionary<KeyType, KeyPressAction>();
 
-        /// <summary>
-        ///   Binds a particular action to a key. Whenever the key is pressed, the action will be executed.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="action"></param>
-        public static void RegisterKeypressAction(KeyType key, Action action) 
+        public static void OnKeypress(KeyType key, Action downAction, Action? upAction = null) 
         {
-            _keypressRegistry[key] = action;
+            _keypressRegistry[key] = new KeyPressAction(downAction, upAction);
         }
 
-        /// <summary>
-        ///   Polls the SDL event queue.
-        /// </summary>
-        /// <returns>
-        ///   Returns the type of event that was taken off the queue.
-        /// </returns>
-        public static EventType PollEvents()
+        public static int PollEvents()
         {
             while (SDL.SDL_PollEvent(out _event) != 0)
             {
                 if (_event.type == SDL.SDL_EventType.SDL_QUIT)
                 {
-                    return EventType.Quit;
+                    return -1;
                 }
                 else if (_event.type == SDL.SDL_EventType.SDL_KEYDOWN)
                 {
@@ -55,19 +29,38 @@ namespace SdlSharp
 
                     if (sdlKey == SDL.SDL_Keycode.SDLK_ESCAPE)
                     {
-                        return EventType.Quit;
+                        return 0;
                     }
-                    else 
+                    else
                     {
                         KeyType key = KeyTypeExtension.MapSdlKeycode(sdlKey);
+                        if (_keypressRegistry.TryGetValue(key, out var toPerform))
+                        {
+                            toPerform.DownAction.Invoke();
+                        }
+                        else
+                        {
+                            Console.WriteLine("You must bind this key to an action in order to use it.");
+                        }
+                    }
+                }
+                else if (_event.type == SDL.SDL_EventType.SDL_KEYUP)
+                {
+                    SDL.SDL_Keycode sdlKey = _event.key.keysym.sym;
 
-                        Action toPerform = _keypressRegistry[key];
-                        toPerform.Invoke();
+                    KeyType key = KeyTypeExtension.MapSdlKeycode(sdlKey);
+                    if (_keypressRegistry.TryGetValue(key, out var toPerform))
+                    {
+                        toPerform.UpAction.Invoke();
+                    }
+                    else
+                    {
+                        Console.WriteLine("You must bind this key to an action in order to use it.");
                     }
                 }
             }
 
-            return EventType.Other;
+            return 0;
         }
     }
 }
