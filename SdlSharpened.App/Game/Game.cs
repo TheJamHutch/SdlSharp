@@ -10,9 +10,7 @@ namespace SdlSharpened.App
         private Mixer _mixer;
         private Window _window;
         private Renderer _renderer;
-        private Texture _texture;
-        private Rect _srcRect;
-        private Rect _dstRect;
+        private Player _player;
 
         private MusicTrack _musicTrack;
         private SoundEffect _soundEffect;
@@ -28,9 +26,7 @@ namespace SdlSharpened.App
             _mixer = new Mixer();
             _window = new Window("My SdlSharp App", 640, 480);
             _renderer = new Renderer();
-            _texture = new Texture("./img/testimg.bmp", ColourType.Magenta);
-            _srcRect = new Rect(0, 0, 32, 32);
-            _dstRect = new Rect(100, 100, 32, 32);
+            _player = new Player();
 
             _musicTrack = new MusicTrack("./sound/arena_main.mp3");
             _soundEffect = new SoundEffect("./sound/shit.wav");
@@ -61,11 +57,8 @@ namespace SdlSharpened.App
         public void Render()
         {
             _renderer.Clear();
-            _renderer.Copy(_texture, _srcRect, _dstRect);
-            _renderer.SetDrawColour(ColourType.Yellow);
-            _renderer.DrawRect(_dstRect);
+            _player.Render(_renderer);
             _renderer.FillRect(new Rect(400, 200, 50, 50), ColourType.Magenta);
-            _renderer.DrawRect(new Rect(50, 300, 20, 50));
             _renderer.Present();
         }
 
@@ -107,8 +100,7 @@ namespace SdlSharpened.App
                 }
 
                 // Move player
-                _dstRect.X += xv;
-                _dstRect.Y += yv;
+                _player.Move(xv, yv);
 
                 Render();
                 _system.Delay(33);

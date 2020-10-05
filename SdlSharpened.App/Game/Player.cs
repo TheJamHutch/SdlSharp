@@ -3,7 +3,7 @@ using SdlSharpened;
 
 namespace SdlSharpened.App
 {
-    class Player
+    public class Player
     {
         private Texture _texture;
         private Rect _srcRect;
@@ -21,9 +21,9 @@ namespace SdlSharpened.App
 
         }
 
-        public void Render()
+        public void Render(Renderer renderer)
         {
-        
+            renderer.Copy(_texture, _srcRect, _dstRect);
         }
 
         public void Move(int xv, int yv) 

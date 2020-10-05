@@ -4,7 +4,15 @@ using System.Text;
 
 namespace SdlSharpened.App
 {
-    class Sound
+    public class Sound
     {
+        private MusicTrack _musicTrack;
+        private SoundEffect _soundEffect;
+
+        public Sound()
+        {
+            _musicTrack = new MusicTrack("./sound/arena_main.mp3");
+            _soundEffect = new SoundEffect("./sound/shit.wav");
+        }
     }
 }
