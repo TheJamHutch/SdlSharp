@@ -28,12 +28,12 @@ How to Use
 
 The author does not intend to take any credit for SDL2 or SDL2-CS.
 
-SDL2
-Developer(s): SDL Community
-Wesbite: https://www.libsdl.org/
-License: GNU LGPL
+SDL2 \
+Developer(s): SDL Community \
+Wesbite: https://www.libsdl.org/ \
+License: GNU LGPL \
 
-SDL2-CS:
-Developer(s): flibitijibibo
-Website: https://github.com/flibitijibibo/SDL2-CS
+SDL2-CS \
+Developer(s): flibitijibibo \
+Website: https://github.com/flibitijibibo/SDL2-CS \
 License: zlib
