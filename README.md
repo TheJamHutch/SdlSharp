@@ -23,10 +23,12 @@ Acquire the SDL2 runtime libraries.
 
 How to Use
 ---
+1. Create and SdlSystem object
+2. Create a Window onject
+3. Create a Renderer object
 
+---
 The author does not accept any credit for SDL2 or SDL2-CS.
-
-Credit and Attribution
 
 SDL2 \
 Developer(s): SDL Community \
