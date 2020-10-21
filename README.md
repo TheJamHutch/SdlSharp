@@ -28,6 +28,8 @@ How to Use
 
 The author does not intend to take any credit for SDL2 or SDL2-CS.
 
+Credit and Attribution
+
 SDL2 \
 Developer(s): SDL Community \
 Wesbite: https://www.libsdl.org/ \
