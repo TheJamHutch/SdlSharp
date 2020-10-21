@@ -10,13 +10,11 @@ In This Project
 ---
 SdlSharpened: \
 SdlSharpened.App: A demonstration, using the SdlSharpened library to create a simple 2D, top-down, tile-based video game. \
-SdlSharpened.Tests: Unit tests using the XUnit testing framework. \
+SdlSharpened.Tests: Unit tests using the XUnit testing framework.
 
 Dependencies
 ---
-.NET Core
-SDL2
-SDL2-CS
+.NET Core, SDL2, SDL2-CS
 
 Install
 ---
@@ -26,7 +24,7 @@ Acquire the SDL2 runtime libraries.
 How to Use
 ---
 
-The author does not intend to take any credit for SDL2 or SDL2-CS.
+The author does not accept any credit for SDL2 or SDL2-CS.
 
 Credit and Attribution
 
