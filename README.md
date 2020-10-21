@@ -8,9 +8,9 @@ SdlSharpened is an SDL2-CS abstraction layer, aimed at making the popular SDL2 m
 
 In This Project
 ---
-SdlSharpened:
-SdlSharpened.App: A demonstration, using the SdlSharpened library to create a simple 2D, top-down, tile-based video game.
-SdlSharpened.Tests: Unit tests using the XUnit testing framework.
+SdlSharpened: \
+SdlSharpened.App: A demonstration, using the SdlSharpened library to create a simple 2D, top-down, tile-based video game. \
+SdlSharpened.Tests: Unit tests using the XUnit testing framework. \
 
 Dependencies
 ---
