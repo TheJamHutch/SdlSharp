@@ -3,10 +3,10 @@ using SDL2;
 
 namespace SdlSharpened
 {
-    public static class Global
+    internal static class Global
     {
-        public static IntPtr WindowPointer { get; set; }
+        internal static IntPtr WindowPointer { get; set; }
 
-        public static IntPtr RendererPointer { get; set; }
+        internal static IntPtr RendererPointer { get; set; }
     }
 }

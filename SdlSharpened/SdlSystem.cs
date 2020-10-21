@@ -15,9 +15,12 @@ namespace SdlSharpened
             SDL.SDL_Quit();
         }
 
-        public void Delay(uint millis)
+        public void Delay(int millis)
         {
-            SDL.SDL_Delay(millis);
+            if (millis > 0)
+            {
+                SDL.SDL_Delay((uint)millis);
+            }
         }
 
         public uint Ticks()
