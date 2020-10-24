@@ -9,7 +9,7 @@
         West
     }
 
-    public static class MoveDirectionExtensions 
+    public static class MoveDirectionExtension
     {
         public static void SetVelocities(this MoveDirection moveDirection, out int xVel, out int yVel)
         {

@@ -28,17 +28,14 @@ namespace SdlSharpened.App
 
             // Instantiate game objects
             _system = new SdlSystem();
-            _window = new Window("My SdlSharp App", WINDOW_XRES, WINDOW_YRES);
-            _renderer = new Renderer();
+            _window = new Window("Tile Game", WINDOW_XRES, WINDOW_YRES);
+            _renderer = new Renderer(_window);
             _renderPipeline = new RenderPipeline();
             _camera = new Camera(WINDOW_XRES, WINDOW_YRES);
             _player = new Player();
             //_enemy = new Enemy();
             enemies = new List<Enemy>()
             {
-                new Enemy(),
-                new Enemy(),
-                new Enemy(),
                 new Enemy(),
                 new Enemy(),
                 new Enemy(),
@@ -104,7 +101,7 @@ namespace SdlSharpened.App
                 _camera.Direction = MoveDirection.Stopped;
                 _player.Direction = MoveDirection.Stopped;
             });
-            Eventing.OnKeypress(KeyType.Key_Space, () => _player.Attack());
+            Eventing.OnKeypress(KeyType.Key_Space, () => _window.ShowMessageBox("A", "B"));
             
             _renderer.SetDrawColour(ColourType.Black);
         }

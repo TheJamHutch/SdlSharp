@@ -9,12 +9,13 @@ namespace SdlSharpened.App
 
         private bool _arrived;
         private Random _random;
-        private int _xPos;
-        private int _xVel;
 
         private Texture _texture;
         private Rect _srcRect;
         private Rect _dstRect;
+
+        private int targetX;
+        private int targetY;
 
         public Enemy()
         {
@@ -22,38 +23,54 @@ namespace SdlSharpened.App
 
             _arrived = false;
             _random = new Random();
-            _xPos = _random.Next(1, 640);
-            _xVel = 0;
 
             _texture = new Texture("./img/player2.bmp", ColourType.Magenta);
             _srcRect = new Rect(0, 0, 32, 32);
-            _dstRect = new Rect(_random.Next(1, 640), _random.Next(1, 480), 32, 32);
+            _dstRect = new Rect(10, 10, 32, 32);
+
+            targetX = 200;
+            targetY = 200;    
         }
 
         public void Update() 
         {
-            if (_arrived == true)
+            if (!_arrived)
             {
-                Console.WriteLine("Arrived at destinastion");
-                _arrived = false;
-                _xPos = _random.Next(1, 640);
+                if (_dstRect.X == targetX)
+                {
+                    if (_dstRect.Y == targetY)
+                    {
+                        _arrived = true;
+                    }
+                    else
+                    {
+                        if (_dstRect.Y < targetY)
+                        {
+                            _dstRect.Y += 1;
+                        }
+                        else if (_dstRect.Y > targetY)
+                        {
+                            _dstRect.Y -= 1;
+                        }
+                    }
+                }
+                else
+                {
+                    if (_dstRect.X < targetX)
+                    {
+                        _dstRect.X += 1;
+                    }
+                    else if (_dstRect.X > targetX)
+                    {
+                        _dstRect.X -= 1;
+                    }
+                }
             }
             else 
             {
-                if (_dstRect.X < _xPos)
-                {
-                    _xVel = 1;
-                }
-                else if (_dstRect.X > _xPos)
-                {
-                    _xVel = -1;
-                }
-                else 
-                {
-                    _arrived = true;
-                }
-
-                _dstRect.X += _xVel;
+                targetX = _random.Next(1, 640);
+                targetY = _random.Next(1, 480);
+                _arrived = false;
             }
         }
 

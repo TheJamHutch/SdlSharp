@@ -3,6 +3,9 @@ using SDL2;
 
 namespace SdlSharpened
 {
+    /// <summary>
+    ///   Enum representing every possbile colour choice. Currently severely limited.
+    /// </summary>
     public enum ColourType
     {
         Black = 0,
@@ -15,8 +18,18 @@ namespace SdlSharpened
         White
     }
 
-    public static class Extension 
+    /// <summary>
+    ///   Enum extension methods.
+    /// </summary>
+    public static class ColourTypeExtension 
     {
+        /// <summary>
+        ///   Outputs the RGB byte values associated with the colour type enum.
+        /// </summary>
+        /// <param name="colour">The colour type enum value.</param>
+        /// <param name="r">Red byte value.</param>
+        /// <param name="g">Green byte value.</param>
+        /// <param name="b">Blue byte value.</param>
         public static void ColourBytes(this ColourType colour, out byte r, out byte g, out byte b)
         {
             switch (colour)
@@ -33,19 +46,17 @@ namespace SdlSharpened
             }
         }
 
-        public static UInt32 ColourKey(this ColourType colour) 
-        {
-            ColourBytes(colour, out var r, out var g, out var b);
-
-            var pixelFormat = SDL.SDL_GetWindowPixelFormat(Global.WindowPointer);
-            var pixelStruct = SDL.SDL_AllocFormat(pixelFormat);
-            UInt32 sdlColour = SDL.SDL_MapRGB(pixelStruct, r, g, b);
-
-            return sdlColour;
-        }
-
+        /// <summary>
+        ///   Sets the colour type enum value from RGB byte values. If no direct equivalence is found between the 
+        ///   bytes and the enums, enum will be set to closest corresponding value.
+        /// </summary>
+        /// <param name="colour">The colour type enum value.</param>
+        /// <param name="r">Red byte value.</param>
+        /// <param name="g">Red byte value.</param>
+        /// <param name="b">Red byte value.</param>
         public static void SetFromBytes(this ColourType colour, byte r, byte g, byte b)
         {
+            // Must be a better way
             if (r == 0 && g == 0 && b == 0)
             {
                 colour = ColourType.Black;
@@ -78,6 +89,17 @@ namespace SdlSharpened
             {
                 colour = ColourType.Black;
             }
+        }
+
+        internal static UInt32 ColourKey(this ColourType colour)
+        {
+            ColourBytes(colour, out var r, out var g, out var b);
+
+            var pixelFormat = SDL.SDL_GetWindowPixelFormat(SdlSystem.WindowPointer);
+            var pixelStruct = SDL.SDL_AllocFormat(pixelFormat);
+            UInt32 sdlColour = SDL.SDL_MapRGB(pixelStruct, r, g, b);
+
+            return sdlColour;
         }
     }
 }
