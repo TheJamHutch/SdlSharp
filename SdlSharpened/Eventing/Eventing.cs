@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using SDL2;
 
 namespace SdlSharpened
@@ -7,6 +9,8 @@ namespace SdlSharpened
     public static class Eventing
     {
         private static SDL.SDL_Event _event = new SDL.SDL_Event();
+
+        private static Action _timerAction;
 
         private static Dictionary<KeyType, KeyPressAction> _keypressRegistry = new Dictionary<KeyType, KeyPressAction>();
 
@@ -28,6 +32,12 @@ namespace SdlSharpened
         public static void OnMouseButtonUp(Action<int, int> action) 
         {
             MouseAction.ButtonUp = action;
+        }
+
+        public static void OnTimeout(int interval, Action action) 
+        {
+            _timerAction = action;
+            SDL.SDL_AddTimer((uint)interval, timerCallback, IntPtr.Zero);
         }
 
         public static int PollEvents()
@@ -80,6 +90,12 @@ namespace SdlSharpened
                 }
             }
 
+            return 0;
+        }
+
+        private static uint timerCallback(uint interval, IntPtr param) 
+        {
+            _timerAction.Invoke();
             return 0;
         }
     }
