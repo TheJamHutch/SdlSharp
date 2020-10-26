@@ -4,7 +4,7 @@
 
 About
 ---
-SdlSharpened is an SDL2-CS abstraction layer, aimed at making the popular SDL2 media library simpler and more convenient to use from a C# context (with the help of the SDL2-CS bidndings, courtesy of 'flibitijibibo'). SdlSharpened aims to do this without removing all but the most arcane and unnecessary of functionalities.
+SdlSharpened is an SDL2-CS abstraction layer, aimed at making the popular SDL2 media library simpler and more convenient to use from a C# context (with the help of the SDL2-CS bidndings, courtesy of 'flibitijibibo').
 
 In This Project
 ---
