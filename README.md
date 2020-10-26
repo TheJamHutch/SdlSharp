@@ -14,7 +14,7 @@ SdlSharpened.Tests: Unit tests using the XUnit testing framework.
 
 Dependencies
 ---
-.NET Core, SDL2, SDL2-CS
+.NET Core, SDL2, SDL2_mixer, SDL2_image
 
 Install
 ---
