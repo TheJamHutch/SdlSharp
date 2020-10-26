@@ -11,17 +11,28 @@ namespace SdlSharpened
         /// <summary>
         ///    A pointer to the internal SDL window.
         /// </summary>
-        public IntPtr Pointer { get; }
+        internal IntPtr Pointer { get; }
 
         /// <summary>
-        ///   Creates a window of a given pixel width and height and sets the title.
+        ///   Creates a window in the center of the screen of a given pixel width and height, and sets the title.
         /// </summary>
         /// <param name="title">The title text at the top of the window.</param>
         /// <param name="width">The pixel width of the window.</param>
         /// <param name="height">The pixel height of the window.</param>
         public Window(string title, int width, int height)
         {
-            Pointer = SDL.SDL_CreateWindow(title, 100, 100, width, height, 0);
+            Pointer = SDL.SDL_CreateWindow(title, SDL.SDL_WINDOWPOS_CENTERED, SDL.SDL_WINDOWPOS_CENTERED, width, height, 0);
+            SdlSystem.WindowPointer = Pointer;
+        }
+
+        /// <summary>
+        ///   Creates a window in the center of the screen of a given pixel width and height, and sets the title.
+        /// </summary>
+        /// <param name="title">The title text at the top of the window.</param>
+        /// <param name="point">A point representing the pixel width and height of the window.</param>
+        public Window(string title, Point point)
+        {
+            Pointer = SDL.SDL_CreateWindow(title, SDL.SDL_WINDOWPOS_CENTERED, SDL.SDL_WINDOWPOS_CENTERED, point.SdlPoint.x, point.SdlPoint.y, 0);
             SdlSystem.WindowPointer = Pointer;
         }
 

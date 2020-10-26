@@ -18,10 +18,12 @@ namespace SdlSharpened
         public SdlSystem()
         {
             SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING);
+            SDL_image.IMG_Init(SDL_image.IMG_InitFlags.IMG_INIT_JPG | SDL_image.IMG_InitFlags.IMG_INIT_PNG | SDL_image.IMG_InitFlags.IMG_INIT_TIF);
         }
 
         ~SdlSystem()
         {
+            SDL_image.IMG_Quit();
             SDL.SDL_Quit();
         }
 
@@ -58,12 +60,12 @@ namespace SdlSharpened
         }
 
         /// <summary>
-        ///   Returns the amount of RAM configured in the system in megabytes.
+        ///   Returns the base file path.
         /// </summary>
-        /// <returns>Number representing the amount of systemm RAM in megabytes</returns>
-        public int GetSystemRAM() 
+        /// <returns>The base file path string.</returns>
+        public string GetAppPath() 
         {
-            return SDL.SDL_GetSystemRAM();
+            return SDL.SDL_GetBasePath();
         }
 
         /// <summary>

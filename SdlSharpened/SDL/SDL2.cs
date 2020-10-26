@@ -3824,6 +3824,15 @@ namespace SDL2
 			out SDL_Rect result
 		);
 
+		/* Override to allow passing null Rect ref with IntPtr.Zero */
+		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern SDL_bool SDL_EnclosePoints(
+			[In] SDL_Point[] points,
+			int count,
+			IntPtr clip,
+			out SDL_Rect result
+		);
+
 		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern SDL_bool SDL_HasIntersection(
 			ref SDL_Rect A,

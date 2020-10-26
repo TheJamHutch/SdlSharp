@@ -16,10 +16,9 @@ namespace SdlSharpened
         /// <summary>
         ///   Creates the renderer from the window.
         /// </summary>
-        /// <param name="window">A window object.</param>
-        public Renderer(Window window)
+        public Renderer()
         {
-            Pointer = SDL.SDL_CreateRenderer(window.Pointer, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
+            Pointer = SDL.SDL_CreateRenderer(SdlSystem.WindowPointer, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
             SdlSystem.RendererPointer = Pointer;
         }
 
@@ -37,7 +36,6 @@ namespace SdlSharpened
             SDL.SDL_GetRenderDrawColor(Pointer, out byte r, out byte g, out byte b, out var a);
 
             ColourType colour = ColourType.Black;
-
             colour.SetFromBytes(r, g, b);
 
             return colour;
@@ -70,14 +68,14 @@ namespace SdlSharpened
         /// <param name="dstRect">Positioning rect.</param>
         public void Copy(Texture texture, Rect srcRect, Rect dstRect) 
         {
-            var src = srcRect.Pointer();
-            var dst = dstRect.Pointer();
+            var src = srcRect.SdlRect;
+            var dst = dstRect.SdlRect;
 
             SDL.SDL_RenderCopy(Pointer, texture.Pointer, ref src, ref dst);
         }
 
        /// <summary>
-       ///   Perfors a renderer present.
+       ///   Performs a renderer present.
        /// </summary>
         public void Present() 
         {
@@ -87,12 +85,31 @@ namespace SdlSharpened
         #region Draw Primitive Shapes
 
         /// <summary>
+        ///   Renders a point in the current draw colour.
+        /// </summary>
+        /// <param name="xpos">The X position value.</param>
+        /// <param name="ypos">The Y position value.</param>
+        public void DrawPoint(int xpos, int ypos)
+        {
+            SDL.SDL_RenderDrawPoint(Pointer, xpos, ypos);
+        }
+
+        /// <summary>
+        ///   Renders a point in the current draw colour.
+        /// </summary>
+        /// <param name="point"></param>
+        public void DrawPoint(Point point)
+        {
+            SDL.SDL_RenderDrawPoint(Pointer, point.SdlPoint.x, point.SdlPoint.y);
+        }
+
+        /// <summary>
         ///   Draws the outline of the rect in the current renderer draw colour.
         /// </summary>
         /// <param name="rect">The rect to draw.</param>
         public void DrawRect(Rect rect) 
         {
-            SDL.SDL_Rect sdlRect = rect.Pointer();
+            SDL.SDL_Rect sdlRect = rect.SdlRect;
             SDL.SDL_RenderDrawRect(Pointer, ref sdlRect);
         }
 
@@ -103,7 +120,7 @@ namespace SdlSharpened
         /// <param name="colour">The colour to draw the rect in.</param>
         public void DrawRect(Rect rect, ColourType colour)
         {
-            SDL.SDL_Rect sdlRect = rect.Pointer();
+            SDL.SDL_Rect sdlRect = rect.SdlRect;
             ColourType prevColour = GetDrawColour();
             SetDrawColour(colour);
             SDL.SDL_RenderDrawRect(Pointer, ref sdlRect);
@@ -116,7 +133,7 @@ namespace SdlSharpened
         /// <param name="rect">The rect to fill.</param>
         public void FillRect(Rect rect)
         {
-            SDL.SDL_Rect sdlRect = rect.Pointer();
+            SDL.SDL_Rect sdlRect = rect.SdlRect;
             SDL.SDL_RenderFillRect(Pointer, ref sdlRect);
         }
 
@@ -127,7 +144,7 @@ namespace SdlSharpened
         /// <param name="colour">The colour to fill the rect in.</param>
         public void FillRect(Rect rect, ColourType colour)
         {
-            SDL.SDL_Rect sdlRect = rect.Pointer();
+            SDL.SDL_Rect sdlRect = rect.SdlRect;
             ColourType prevColour = GetDrawColour();
             SetDrawColour(colour);
             SDL.SDL_RenderFillRect(Pointer, ref sdlRect);

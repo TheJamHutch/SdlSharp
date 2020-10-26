@@ -20,7 +20,9 @@ namespace SdlSharpened.App
         private Player _player;
         //private Enemy _enemy;
         private List<Enemy> enemies;
-        private Tilemap _tilemap;
+
+        private Tilemap _baseMap;
+        private Tilemap _topMap;
 
         public Game()
         {
@@ -29,7 +31,7 @@ namespace SdlSharpened.App
             // Instantiate game objects
             _system = new SdlSystem();
             _window = new Window("Tile Game", WINDOW_XRES, WINDOW_YRES);
-            _renderer = new Renderer(_window);
+            _renderer = new Renderer();
             _renderPipeline = new RenderPipeline();
             _camera = new Camera(WINDOW_XRES, WINDOW_YRES);
             _player = new Player();
@@ -42,10 +44,13 @@ namespace SdlSharpened.App
                 new Enemy(),
                 new Enemy()
             };
-            _tilemap = new Tilemap("./img/tilesheet.bmp", 30, 20, TileSize.Medium);
+
+            _baseMap = new Tilemap("./img/tilesheet.bmp", 30, 20, TileSize.Medium);
+            _topMap = new Tilemap("./img/topsheet.bmp", 30, 20, TileSize.Medium, ColourType.Magenta);
 
             // Push newly created renderables onto render pipeline (order is important)
-            _renderPipeline.Push(_tilemap);
+            _renderPipeline.Push(_baseMap);
+            _renderPipeline.Push(_topMap);
             _renderPipeline.Push(_player);
             //_renderPipeline.Push(_enemy);
             foreach (var enemy in enemies)
@@ -108,8 +113,8 @@ namespace SdlSharpened.App
 
         public void Update() 
         {
-            _camera.Update(_tilemap.MapArea);
-            _player.Update(_tilemap.MapArea);
+            _camera.Update(_baseMap.MapArea);
+            _player.Update(_baseMap.MapArea);
             //_enemy.Update();
             foreach (var enemy in enemies)
             {

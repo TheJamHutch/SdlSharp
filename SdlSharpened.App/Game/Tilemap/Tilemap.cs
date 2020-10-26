@@ -2,14 +2,6 @@
 
 namespace SdlSharpened.App
 {
-    public enum TileSize 
-    {
-        Tiny = 8,
-        Small = 16,
-        Medium = 32,
-        Large = 64
-    };
-
     public class Tilemap : IRenderable
     {
         public Rect MapArea { get; set; }
@@ -30,11 +22,32 @@ namespace SdlSharpened.App
             int mapH = _yCells * (int)_tileSize;
             MapArea = new Rect(0, 0, mapW, mapH);
 
-            _texture = new Texture(path, 0);
+            _texture = new Texture(path);
+
+            _tile = new int[_xCells, _yCells];
+        }
+
+        public Tilemap(string path, int xCells, int yCells, TileSize tileSize, ColourType tspCol)
+        {
+            _xCells = xCells;
+            _yCells = yCells;
+            _tileSize = tileSize;
+
+            int mapW = _xCells * (int)_tileSize;
+            int mapH = _yCells * (int)_tileSize;
+            MapArea = new Rect(0, 0, mapW, mapH);
+
+            _texture = new Texture(path, tspCol);
 
             _tile = new int[_xCells, _yCells];
 
-            _tile[5, 2] = 2;
+            SetAllTiles(-1);
+
+            SetTile(1, 1, 1);
+            SetTile(2, 1, 1);
+            SetTile(3, 1, 1);
+            SetTile(4, 1, 1);
+            SetTile(5, 1, 1);
         }
 
         void IRenderable.Render(Renderer renderer, Camera camera)
@@ -56,19 +69,28 @@ namespace SdlSharpened.App
                     dstRect.X = x * (int)_tileSize - camera.DstRect.X;
                     dstRect.Y = y * (int)_tileSize - camera.DstRect.Y;
 
-                    renderer.Copy(_texture, srcRect, dstRect);
+                    if (_tile[x, y] != -1)
+                    {
+                        renderer.Copy(_texture, srcRect, dstRect);
+                    }
                 }
             }
         }
 
-        public void Save()
+        public void SetTile(int xcell, int ycell, int tileType) 
         {
-
+            _tile[xcell, ycell] = tileType;
         }
 
-        public void Load()
+        public void SetAllTiles(int tileType) 
         {
-        
+            for (int y = 0; y < _yCells; y++)
+            {
+                for (int x = 0; x < _xCells; x++)
+                {
+                    _tile[x, y] = tileType;
+                }
+            }
         }
 
         private Rect SetFrame(int tile)
