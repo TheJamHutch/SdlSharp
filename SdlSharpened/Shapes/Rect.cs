@@ -131,26 +131,5 @@ namespace SdlSharpened
 
             return (result == SDL.SDL_bool.SDL_TRUE) ? true : false;
         }
-
-        /* NEEDS MOVING!
-         * 
-        /// <summary>
-        ///   Calculates the minimum sized Rect needed to enclose a set of discrete points. 
-        /// </summary>
-        /// <param name="points"></param>
-        /// <returns></returns>
-        public bool EnclosePoints(IEnumerable<Point> points) 
-        {
-            var sdlPoints = new List<SDL.SDL_Point>();
-
-            foreach (var point in points)
-            {
-                sdlPoints.Add(point._sdlPoint);
-            }
-
-            SDL.SDL_EnclosePoints(sdlPoints.ToArray(), sdlPoints.Count, IntPtr.Zero, out var resultRect);
-
-            return (result == SDL.SDL_bool.SDL_TRUE) ? true : false;
-        }*/
     }
 }
