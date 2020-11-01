@@ -12,15 +12,19 @@ namespace SdlSharpened.App
 
         private bool _running;
 
+        // SdlSharpened objects
         private SdlSystem _system;
         private Window _window;
         private Renderer _renderer;
+        private EventHandler _eventHandler;
+
+        // Game objects
         private RenderPipeline _renderPipeline;
         private Camera _camera;
         private Player _player;
-        //private Enemy _enemy;
         private List<Enemy> enemies;
-        private Tilemap _tilemap;
+        private Tilemap _baseMap;
+        private Tilemap _topMap;
 
         public Game()
         {
@@ -30,6 +34,7 @@ namespace SdlSharpened.App
             _system = new SdlSystem();
             _window = new Window("Tile Game", WINDOW_XRES, WINDOW_YRES);
             _renderer = new Renderer(_window);
+            _eventHandler = new EventHandler();
             _renderPipeline = new RenderPipeline();
             _camera = new Camera(WINDOW_XRES, WINDOW_YRES);
             _player = new Player();
@@ -42,10 +47,13 @@ namespace SdlSharpened.App
                 new Enemy(),
                 new Enemy()
             };
-            _tilemap = new Tilemap("./img/tilesheet.bmp", 30, 20, TileSize.Medium);
+
+            _baseMap = new Tilemap("./img/tilesheet.bmp", 30, 20, TileSize.Medium);
+            _topMap = new Tilemap("./img/topsheet.bmp", 30, 20, TileSize.Medium, ColourType.Magenta);
 
             // Push newly created renderables onto render pipeline (order is important)
-            _renderPipeline.Push(_tilemap);
+            _renderPipeline.Push(_baseMap);
+            _renderPipeline.Push(_topMap);
             _renderPipeline.Push(_player);
             //_renderPipeline.Push(_enemy);
             foreach (var enemy in enemies)
@@ -53,11 +61,13 @@ namespace SdlSharpened.App
                 _renderPipeline.Push(enemy);
             }
 
+            
+
             // Register event callbacks
-            Eventing.OnKeypress(KeyType.Key_Escape, () => Stop());
-            Eventing.OnKeypress(KeyType.Key_F5, () => Save());
-            Eventing.OnKeypress(KeyType.Key_F6, () => Load());
-            Eventing.OnKeypress(KeyType.Key_W,
+            _eventHandler.KeyboardEvents.OnKeypress(KeyType.Key_Escape, () => Stop());
+            _eventHandler.KeyboardEvents.OnKeypress(KeyType.Key_F5, () => Save());
+            _eventHandler.KeyboardEvents.OnKeypress(KeyType.Key_F6, () => Load());
+            _eventHandler.KeyboardEvents.OnKeypress(KeyType.Key_W,
             () =>
             {
                 _camera.Direction = MoveDirection.North;
@@ -68,7 +78,7 @@ namespace SdlSharpened.App
                 _camera.Direction = MoveDirection.Stopped;
                 _player.Direction = MoveDirection.Stopped;
             });
-            Eventing.OnKeypress(KeyType.Key_D,
+            _eventHandler.KeyboardEvents.OnKeypress(KeyType.Key_D,
             () =>
             {
                 _camera.Direction = MoveDirection.East;
@@ -79,7 +89,7 @@ namespace SdlSharpened.App
                 _camera.Direction = MoveDirection.Stopped;
                 _player.Direction = MoveDirection.Stopped;
             });
-            Eventing.OnKeypress(KeyType.Key_S,
+            _eventHandler.KeyboardEvents.OnKeypress(KeyType.Key_S,
             () =>
             {
                 _camera.Direction = MoveDirection.South;
@@ -90,7 +100,7 @@ namespace SdlSharpened.App
                 _camera.Direction = MoveDirection.Stopped;
                 _player.Direction = MoveDirection.Stopped;
             });
-            Eventing.OnKeypress(KeyType.Key_A,
+            _eventHandler.KeyboardEvents.OnKeypress(KeyType.Key_A,
             () =>
             {
                 _camera.Direction = MoveDirection.West;
@@ -101,16 +111,14 @@ namespace SdlSharpened.App
                 _camera.Direction = MoveDirection.Stopped;
                 _player.Direction = MoveDirection.Stopped;
             });
-            Eventing.OnKeypress(KeyType.Key_Space, () => _window.ShowMessageBox("A", "B"));
-            
+            _eventHandler.KeyboardEvents.OnKeypress(KeyType.Key_Space, () => _window.ShowMessageBox("A", "B"));
             _renderer.SetDrawColour(ColourType.Black);
         }
 
         public void Update() 
         {
-            _camera.Update(_tilemap.MapArea);
-            _player.Update(_tilemap.MapArea);
-            //_enemy.Update();
+            _camera.Update(_baseMap.MapArea);
+            _player.Update(_baseMap.MapArea);
             foreach (var enemy in enemies)
             {
                 enemy.Update();
@@ -162,7 +170,7 @@ namespace SdlSharpened.App
             while (_running)
             {
                 // Check for quit event
-                if (Eventing.PollEvents() == -1)
+                if (_eventHandler.PollEvents() == -1)
                 {
                     _running = false;
                 }

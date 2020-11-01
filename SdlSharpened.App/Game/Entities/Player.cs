@@ -42,6 +42,7 @@ namespace SdlSharpened.App
 
             Direction.SetVelocities(out xVel, out yVel);
 
+            // Map edge
             if ((_dstRect.X < 0) && (Direction == MoveDirection.West))
             {
                 xVel = 0;
@@ -58,6 +59,8 @@ namespace SdlSharpened.App
             {
                 yVel = 0;
             }
+
+            // Enemy collision
 
             _dstRect.X += xVel * 2;
             _dstRect.Y += yVel * 2;
