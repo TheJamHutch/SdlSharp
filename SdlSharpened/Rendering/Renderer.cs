@@ -16,9 +16,9 @@ namespace SdlSharpened
         /// <summary>
         ///   Creates the renderer from the window.
         /// </summary>
-        public Renderer()
+        public Renderer(Window window)
         {
-            Pointer = SDL.SDL_CreateRenderer(SdlSystem.WindowPointer, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
+            Pointer = SDL.SDL_CreateRenderer(window.Pointer, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
             SdlSystem.RendererPointer = Pointer;
         }
 

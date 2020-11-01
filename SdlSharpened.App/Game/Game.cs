@@ -33,7 +33,7 @@ namespace SdlSharpened.App
             // Instantiate game objects
             _system = new SdlSystem();
             _window = new Window("Tile Game", WINDOW_XRES, WINDOW_YRES);
-            _renderer = new Renderer();
+            _renderer = new Renderer(_window);
             _eventHandler = new EventHandler();
             _renderPipeline = new RenderPipeline();
             _camera = new Camera(WINDOW_XRES, WINDOW_YRES);
