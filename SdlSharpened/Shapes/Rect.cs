@@ -5,21 +5,13 @@ namespace SdlSharpened
     /// <summary>
     ///   Class representing a rectangle that can be used to clip and position rendered items.
     /// </summary>
-    public class Rect
+    public struct Rect
     {
         // Used by other classes to get the internal SDL_Rect
         internal SDL.SDL_Rect SdlRect { get { return _sdlRect; } }
 
         // The internal SDL_Rect
         private SDL.SDL_Rect _sdlRect;
-
-        /// <summary>
-        ///   Creates a default, non-empty Rect with a positon of (0, 0) and a width and height of one.
-        /// </summary>
-        public Rect()
-        {
-            _sdlRect = new SDL.SDL_Rect() { x = 0, y = 0, w = 1, h = 1 };
-        }
 
         /// <summary>
         ///   Creates a Rect of a specified width and height at the default position (0, 0). 
@@ -77,11 +69,6 @@ namespace SdlSharpened
         {
             get { return _sdlRect.h; }
             set { _sdlRect.h = value; }
-        }
-
-        public ref SDL.SDL_Rect Pointer()
-        {
-            return ref _sdlRect;
         }
 
         /// <summary>

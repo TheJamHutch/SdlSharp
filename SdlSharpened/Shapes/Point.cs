@@ -6,19 +6,11 @@ namespace SdlSharpened
     /// <summary>
     ///   Class represents a two-dimensional point in space.
     /// </summary>
-    public class Point
+    public struct Point
     {
         internal SDL.SDL_Point SdlPoint { get { return _sdlPoint; } }
 
         private SDL.SDL_Point _sdlPoint;
-
-        /// <summary>
-        ///   Creates a default point with x and y values of zero.
-        /// </summary>
-        public Point()
-        {
-            _sdlPoint = new SDL.SDL_Point() { x = 0, y = 0 };
-        }
 
         /// <summary>
         ///   Creates a point with the specified X and Y values.

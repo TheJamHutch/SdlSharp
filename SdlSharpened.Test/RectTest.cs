@@ -8,17 +8,6 @@ namespace SdlSharpened.Test
 {
     public class RectTest
     {
-        [Fact (DisplayName = "Should construct default rect")]
-        public void ShouldConstructRectWithDefaults()
-        {
-            Rect rect = new Rect();
-
-            rect.X.Should().Be(0);
-            rect.Y.Should().Be(0);
-            rect.W.Should().Be(1); 
-            rect.H.Should().Be(1);
-        }
-
         [Fact (DisplayName = "Should construct rect with specified width and height")]
         public void ShouldConstructRectWithSpecifiedWidthAndHeight()
         {
