@@ -2,27 +2,14 @@
 
 namespace SdlSharpened
 {
-    public class EventHandler
+    public static class Eventing
     {
-        public KeyboardEventHandler KeyboardEvents { get { return _keyboardEventHandler; } }
-
-        public MouseEventHandler MouseEvents { get { return _mouseEventHandler; } }
-
-        private KeyboardEventHandler _keyboardEventHandler;
-
-        private MouseEventHandler _mouseEventHandler;
+        internal static KeyboardHandler KeyboardHandlerInstance;
 
         // The internal SDL_Event struct
-        private SDL.SDL_Event _sdlEvent;
+        private static SDL.SDL_Event _sdlEvent = new SDL.SDL_Event();
 
-        public EventHandler()
-        {
-            _keyboardEventHandler = new KeyboardEventHandler();
-            _mouseEventHandler = new MouseEventHandler();
-            _sdlEvent = new SDL.SDL_Event();
-        }
-
-        public int PollEvents() 
+        public static int PollEvents() 
         {
             while (SDL.SDL_PollEvent(out _sdlEvent) != 0)
             {
@@ -36,7 +23,7 @@ namespace SdlSharpened
                     // handler to invoke.
                     SDL.SDL_Keycode sdlKey = _sdlEvent.key.keysym.sym;
                     KeyType key = KeyTypeExtension.MapSdlKeycode(sdlKey);
-                    _keyboardEventHandler.InvokeKeyDownAction(key);
+                    KeyboardHandlerInstance.InvokeKeyDownAction(key);
                 }
                 else if (_sdlEvent.type == SDL.SDL_EventType.SDL_KEYUP)
                 {
@@ -44,7 +31,7 @@ namespace SdlSharpened
                     // handler to invoke.
                     SDL.SDL_Keycode sdlKey = _sdlEvent.key.keysym.sym;
                     KeyType key = KeyTypeExtension.MapSdlKeycode(sdlKey);
-                    _keyboardEventHandler.InvokeKeyUpAction(key);
+                    KeyboardHandlerInstance.InvokeKeyUpAction(key);
                 }
                 /*
                 else if (_sdlEvent.type == SDL.SDL_EventType.SDL_MOUSEMOTION)

@@ -19,10 +19,12 @@ namespace SdlSharpened
         {
             SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING);
             SDL_image.IMG_Init(SDL_image.IMG_InitFlags.IMG_INIT_JPG | SDL_image.IMG_InitFlags.IMG_INIT_PNG | SDL_image.IMG_InitFlags.IMG_INIT_TIF);
+            SDL_ttf.TTF_Init();
         }
 
         ~SdlSystem()
         {
+            SDL_ttf.TTF_Init();
             SDL_image.IMG_Quit();
             SDL.SDL_Quit();
         }
@@ -56,7 +58,9 @@ namespace SdlSharpened
         {
             SDL.SDL_GetVersion(out var version);
 
-            return $"{version.major}.{version.minor}.{version.patch}";
+            // TODO: Include ttf, image and mixer versions in returned string
+
+            return $"SDL2: {version.major}.{version.minor}.{version.patch}";
         }
 
         /// <summary>

@@ -2,7 +2,7 @@
 
 namespace SdlSharpened
 {
-    public class MouseEventHandler
+    public class MouseHandler : IHandler
     {
         //
         private static readonly Action<int, int> noop = (x, y) => { };
@@ -11,7 +11,7 @@ namespace SdlSharpened
         private Action<int, int> _buttonUpAction = noop;
         private Action<int, int> _moveAction = noop;
 
-        internal MouseEventHandler()
+        internal MouseHandler()
         {
 
         }

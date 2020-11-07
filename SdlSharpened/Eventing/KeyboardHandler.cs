@@ -3,13 +3,14 @@ using System.Collections.Generic;
 
 namespace SdlSharpened
 {
-    public class KeyboardEventHandler
+    public class KeyboardHandler : IHandler
     {
         private Dictionary<KeyType, KeyboardAction> _keypressRegistry;
 
-        internal KeyboardEventHandler()
+        public KeyboardHandler()
         {
             _keypressRegistry = new Dictionary<KeyType, KeyboardAction>();
+            Eventing.KeyboardHandlerInstance = this;
         }
 
         /// <summary>
