@@ -4,12 +4,17 @@ namespace SdlSharpened
 {
     public static class Eventing
     {
+        //
         internal static KeyboardHandler KeyboardHandlerInstance;
+        //
+        internal static MouseHandler MouseHandlerInstance;
+        //
+        internal static GamepadHandler GamepadHandlerInstance;
 
         // The internal SDL_Event struct
         private static SDL.SDL_Event _sdlEvent = new SDL.SDL_Event();
 
-        public static int PollEvents() 
+        public static int PollEvents()
         {
             while (SDL.SDL_PollEvent(out _sdlEvent) != 0)
             {
