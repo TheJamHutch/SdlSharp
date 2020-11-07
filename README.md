@@ -4,17 +4,16 @@
 
 About
 ---
-SdlSharpened is an SDL2-CS abstraction layer, aimed at making the popular SDL2 media library simpler and more convenient to use from a C# context (with the help of the SDL2-CS bidndings, courtesy of 'flibitijibibo').
+Layer over SDL2-CS.
 
 In This Project
 ---
 SdlSharpened: \
-SdlSharpened.App: A demonstration, using the SdlSharpened library to create a simple 2D, top-down, tile-based video game. \
 SdlSharpened.Tests: Unit tests using the XUnit testing framework.
 
 Dependencies
 ---
-.NET Core, SDL2, SDL2_mixer, SDL2_image
+.NET Core, SDL2.dll, SDL2_mixer.dll, SDL2_image.dll, SDL2_ttf.dll
 
 Install
 ---
@@ -33,7 +32,7 @@ The author does not accept any credit for SDL2 or SDL2-CS.
 SDL2 \
 Developer(s): SDL Community \
 Wesbite: https://www.libsdl.org/ \
-License: GNU LGPL \
+License: GNU LGPL
 
 SDL2-CS \
 Developer(s): flibitijibibo \
