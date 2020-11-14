@@ -5,14 +5,13 @@ namespace SdlSharpened
 {
     public static class Eventing
     {
-        //
+        // Not good.
         internal static KeyboardHandler KeyboardHandlerInstance;
-        //
         internal static MouseHandler MouseHandlerInstance;
-        //
         internal static GamepadHandler GamepadHandlerInstance;
+        internal static JoystickHandler JoystickHandlerInstance;
 
-        private static Action _quitAction = () => { };
+        private static Action _quitAction;
 
         // The internal SDL_Event struct
         private static SDL.SDL_Event _sdlEvent = new SDL.SDL_Event();
@@ -22,6 +21,10 @@ namespace SdlSharpened
             _quitAction = quitAction;
         }
 
+        /// <summary>
+        ///   Call this in your main loop. Polls the internal SDL event queue, and invokes any actions bound to that event, 
+        ///   until all events have been dealt with.
+        /// </summary>
         public static void PollEvents()
         {
             while (SDL.SDL_PollEvent(out _sdlEvent) != 0)
@@ -30,34 +33,11 @@ namespace SdlSharpened
                 {
                     _quitAction?.Invoke();
                 }
-                else if (_sdlEvent.type == SDL.SDL_EventType.SDL_KEYDOWN)
-                {
-                    // Get the key type from SDL, convert it to a KeyType enum value and pass to keyboard
-                    // handler to invoke.
-                    SDL.SDL_Keycode sdlKey = _sdlEvent.key.keysym.sym;
-                    KeyType key = KeyTypeExtension.MapSdlKeycode(sdlKey);
-                    KeyboardHandlerInstance.InvokeKeyDownAction(key);
-                }
-                else if (_sdlEvent.type == SDL.SDL_EventType.SDL_KEYUP)
-                {
-                    // Get the key type from SDL, convert it to a KeyType enum value and pass to keyboard
-                    // handler to invoke.
-                    SDL.SDL_Keycode sdlKey = _sdlEvent.key.keysym.sym;
-                    KeyType key = KeyTypeExtension.MapSdlKeycode(sdlKey);
-                    KeyboardHandlerInstance.InvokeKeyUpAction(key);
-                }
-                else if (_sdlEvent.type == SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN)
-                {
-                    MouseHandlerInstance.InvokeButtonDownAction(_sdlEvent.button.x, _sdlEvent.button.y);
-                }
-                else if (_sdlEvent.type == SDL.SDL_EventType.SDL_MOUSEBUTTONUP)
-                {
-                    MouseHandlerInstance.InvokeButtonUpAction(_sdlEvent.button.x, _sdlEvent.button.y);
-                }
-                else if (_sdlEvent.type == SDL.SDL_EventType.SDL_MOUSEMOTION)
-                {
-                    MouseHandlerInstance.InvokeMoveAction(_sdlEvent.button.x, _sdlEvent.button.y);
-                }
+
+                KeyboardHandlerInstance?.PollEvents(_sdlEvent);
+                MouseHandlerInstance?.PollEvents(_sdlEvent);
+                GamepadHandlerInstance?.PollEvents(_sdlEvent);
+                JoystickHandlerInstance?.PollEvents(_sdlEvent);
             }
         }
     }

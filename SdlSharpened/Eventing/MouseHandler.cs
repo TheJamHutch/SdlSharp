@@ -1,15 +1,14 @@
 ﻿using System;
+using SDL2;
 
 namespace SdlSharpened
 {
-    public class MouseHandler : IHandler
+    public class MouseHandler : Handler
     {
-        //
-        private static readonly Action<int, int> noop = (x, y) => { };
-
-        private Action<int, int> _buttonDownAction = noop;
-        private Action<int, int> _buttonUpAction = noop;
-        private Action<int, int> _moveAction = noop;
+        private Action<int, int> _buttonDownAction;
+        private Action<int, int> _buttonUpAction;
+        private Action<int, int> _moveAction;
+        private Action<int, int> _wheelAction;
 
         public MouseHandler()
         {
@@ -17,7 +16,7 @@ namespace SdlSharpened
         }
 
         /// <summary>
-        ///   Registers the action to invoke when a mouse button down event occurs, to the event handler.
+        ///   Registers the action to invoke when a mouse button down event occurs.
         /// </summary>
         /// <param name="action"></param>
         public void OnButtonDown(Action<int, int> action)
@@ -26,16 +25,16 @@ namespace SdlSharpened
         }
 
         /// <summary>
-        ///   Registers the action to invoke when a mouse button up event occurs, to the event handler.
+        ///   Registers the action to invoke when a mouse button up event occurs.
         /// </summary>
         /// <param name="action"></param>
         public void OnButtonUp(Action<int, int> action)
         {
-            _buttonDownAction = action;
+            _buttonUpAction = action;
         }
 
         /// <summary>
-        ///   Registers the action to invoke when a mouse move event occurs, to the event handler.
+        ///   Registers the action to invoke when a mouse move event occurs.
         /// </summary>
         /// <param name="action"></param>
         public void OnMove(Action<int, int> action)
@@ -43,19 +42,33 @@ namespace SdlSharpened
             _moveAction = action;
         }
 
-        internal void InvokeButtonDownAction(int mx, int my) 
+        /// <summary>
+        ///   Registers the action to invoke when a mouse wheel event occurs.
+        /// </summary>
+        /// <param name="action"></param>
+        public void OnWheel(Action<int, int> action) 
         {
-            _buttonDownAction?.Invoke(mx, my);
+            _wheelAction = action;
         }
 
-        internal void InvokeButtonUpAction(int mx, int my) 
+        internal override void PollEvents(SDL.SDL_Event sdlEvent) 
         {
-            _buttonUpAction?.Invoke(mx, my);
-        }
-
-        internal void InvokeMoveAction(int mx, int my) 
-        {
-            _moveAction?.Invoke(mx, my);
+            if (sdlEvent.type == SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN)
+            {
+                _buttonDownAction?.Invoke(sdlEvent.button.x, sdlEvent.button.y);
+            }
+            else if (sdlEvent.type == SDL.SDL_EventType.SDL_MOUSEBUTTONUP)
+            {
+                _buttonUpAction?.Invoke(sdlEvent.button.x, sdlEvent.button.y);
+            }
+            else if (sdlEvent.type == SDL.SDL_EventType.SDL_MOUSEMOTION)
+            {
+                _moveAction?.Invoke(sdlEvent.motion.x, sdlEvent.motion.y);
+            }
+            else if (sdlEvent.type == SDL.SDL_EventType.SDL_MOUSEWHEEL)
+            {
+                _wheelAction?.Invoke(sdlEvent.wheel.x, sdlEvent.wheel.y);
+            }
         }
     }
 }

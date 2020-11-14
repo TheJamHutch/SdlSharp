@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using SDL2;
 
 namespace SdlSharpened
 {
-    public class KeyboardHandler : IHandler
+    /// <summary>
+    ///   This class is responsible for handling keyboard input.
+    /// </summary>
+    public class KeyboardHandler : Handler
     {
         private Dictionary<KeyType, KeyboardAction> _keypressRegistry;
 
@@ -24,23 +28,27 @@ namespace SdlSharpened
             _keypressRegistry[key] = new KeyboardAction(downAction, upAction);
         }
 
-        internal void InvokeKeyDownAction(KeyType keyType) 
+        internal override void PollEvents(SDL.SDL_Event sdlEvent) 
         {
-            bool gotVal = _keypressRegistry.TryGetValue(keyType, out var keyboardAction);
-
-            if (gotVal)
+            if (sdlEvent.type == SDL.SDL_EventType.SDL_KEYDOWN)
             {
-                keyboardAction.DownAction?.Invoke();
+                var sdlKey = sdlEvent.key.keysym.sym;
+                var key = KeyTypeExtension.MapSdlKeycode(sdlKey);
+
+                if (_keypressRegistry.TryGetValue(key, out var action))
+                {
+                    action.DownAction?.Invoke();
+                }
             }
-        }
-
-        internal void InvokeKeyUpAction(KeyType keyType)
-        {
-            bool gotVal = _keypressRegistry.TryGetValue(keyType, out var keyboardAction);
-
-            if (gotVal)
+            else if (sdlEvent.type == SDL.SDL_EventType.SDL_KEYUP)
             {
-                keyboardAction.UpAction?.Invoke();
+                var sdlKey = sdlEvent.key.keysym.sym;
+                var key = KeyTypeExtension.MapSdlKeycode(sdlKey);
+
+                if (_keypressRegistry.TryGetValue(key, out var action))
+                {
+                    action.UpAction?.Invoke();
+                }
             }
         }
     }

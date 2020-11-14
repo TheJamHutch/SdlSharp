@@ -56,11 +56,15 @@ namespace SdlSharpened
         /// <returns>A formatted string representing the SDL version.</returns>
         public string GetVersion()
         {
-            SDL.SDL_GetVersion(out var version);
+            SDL.SDL_GetVersion(out var sdlVersion);
+            var imgVersion = SDL_image.IMG_Linked_Version();
+            //var ttfVersion = SDL_ttf.TTF_LinkedVersion();
+            //var mixVersion = SDL_mixer.MIX_Linked_Version();
 
-            // TODO: Include ttf, image and mixer versions in returned string
-
-            return $"SDL2: {version.major}.{version.minor}.{version.patch}";
+            return $"SDL2: {sdlVersion.major}.{sdlVersion.minor}.{sdlVersion.patch} \n" +
+                   $"SDL_image: {imgVersion.major}.{imgVersion.minor}.{imgVersion.patch} \n";
+                   //$"SDL_ttf: {ttfVersion.major}.{ttfVersion.minor}.{ttfVersion.patch} \n" +
+                   //$"SDL_mixer: {mixVersion.major}.{mixVersion.minor}.{mixVersion.patch}";
         }
 
         /// <summary>
