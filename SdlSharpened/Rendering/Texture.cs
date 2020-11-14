@@ -8,6 +8,9 @@ namespace SdlSharpened
     /// </summary>
     public class Texture
     {
+        public int Width { get; }
+        public int Height { get; }
+
         /// <summary>
         ///   Pointer to the internal SDL texture.
         /// </summary>
@@ -16,20 +19,13 @@ namespace SdlSharpened
         /// <summary>
         ///   Creates a texture from an image file. 24-bit BMP only.
         /// </summary>
-        public Texture()
-        {
-            //Pointer = SDL.SDL_CreateTexture(SdlSystem.RendererPointer, );
-        }
-
-        /// <summary>
-        ///   Creates a texture from an image file. 24-bit BMP only.
-        /// </summary>
         /// <param name="filePath">The filepath of the image file.</param>
         public Texture(string filePath)
         {
-            var srfc = SDL_image.IMG_Load(filePath);
-            Pointer = SDL.SDL_CreateTextureFromSurface(SdlSystem.RendererPointer, srfc);
-            SDL.SDL_FreeSurface(srfc);
+            Pointer = SDL_image.IMG_LoadTexture(SdlSystem.RendererPointer, filePath);
+            SDL.SDL_QueryTexture(Pointer, out var format, out var access, out var w, out var h);
+            Width = w;
+            Height = h;
         }
 
         /// <summary>
@@ -43,6 +39,10 @@ namespace SdlSharpened
             SDL.SDL_SetColorKey(srfc, 1, tspCol.ColourKey());
             Pointer = SDL.SDL_CreateTextureFromSurface(SdlSystem.RendererPointer, srfc);
             SDL.SDL_FreeSurface(srfc);
+
+            SDL.SDL_QueryTexture(Pointer, out var format, out var access, out var w, out var h);
+            Width = w;
+            Height = h;
         }
 
         /// <summary>
@@ -52,6 +52,10 @@ namespace SdlSharpened
         public Texture(Surface surface) 
         {
             Pointer = SDL.SDL_CreateTextureFromSurface(SdlSystem.RendererPointer, surface.Pointer);
+
+            SDL.SDL_QueryTexture(Pointer, out var format, out var access, out var w, out var h);
+            Width = w;
+            Height = h;
         }
 
         ~Texture() 

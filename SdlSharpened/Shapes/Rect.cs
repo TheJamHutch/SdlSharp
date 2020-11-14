@@ -3,7 +3,7 @@
 namespace SdlSharpened
 {
     /// <summary>
-    ///   Class representing a rectangle that can be used to clip and position rendered items.
+    ///   Represents a rectangle that can be used to clip and position rendered items.
     /// </summary>
     public struct Rect
     {
@@ -12,28 +12,6 @@ namespace SdlSharpened
 
         // The internal SDL_Rect
         private SDL.SDL_Rect _sdlRect;
-
-        /// <summary>
-        ///   Creates a Rect of a specified width and height at the default position (0, 0). 
-        /// </summary>
-        /// <param name="width">The pixel width of the Rect.</param>
-        /// <param name="height">The pixel width of the Rect.</param>
-        public Rect(int width, int height)
-        {
-            _sdlRect = new SDL.SDL_Rect() { x = 0, y = 0, w = width, h = height };
-        }
-
-        /// <summary>
-        ///   Creates a Rect of specified position, width, and height.
-        /// </summary>
-        /// <param name="xpos">The pixel X postion of the Rect.</param>
-        /// <param name="ypos">The pixel Y postion of the Rect.</param>
-        /// <param name="width">The pixel width of the Rect.</param>
-        /// <param name="height">The pixel height of the Rect.</param>
-        public Rect(int xpos, int ypos, int width, int height)
-        {
-            _sdlRect = new SDL.SDL_Rect() { x = xpos, y = ypos, w = width, h = height };
-        }
 
         /// <summary>
         ///   The X position of the Rect.
@@ -69,6 +47,18 @@ namespace SdlSharpened
         {
             get { return _sdlRect.h; }
             set { _sdlRect.h = value; }
+        }
+
+        /// <summary>
+        ///   Creates a Rect of specified position, width, and height.
+        /// </summary>
+        /// <param name="xpos">The pixel X postion of the Rect.</param>
+        /// <param name="ypos">The pixel Y postion of the Rect.</param>
+        /// <param name="width">The pixel width of the Rect.</param>
+        /// <param name="height">The pixel height of the Rect.</param>
+        public Rect(int xpos, int ypos, int width, int height)
+        {
+            _sdlRect = new SDL.SDL_Rect() { x = xpos, y = ypos, w = width, h = height };
         }
 
         /// <summary>

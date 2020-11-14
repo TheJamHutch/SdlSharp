@@ -11,9 +11,9 @@ namespace SdlSharpened
         private Action<int, int> _buttonUpAction = noop;
         private Action<int, int> _moveAction = noop;
 
-        internal MouseHandler()
+        public MouseHandler()
         {
-
+            Eventing.MouseHandlerInstance = this;
         }
 
         /// <summary>
@@ -41,6 +41,21 @@ namespace SdlSharpened
         public void OnMove(Action<int, int> action)
         {
             _moveAction = action;
+        }
+
+        internal void InvokeButtonDownAction(int mx, int my) 
+        {
+            _buttonDownAction?.Invoke(mx, my);
+        }
+
+        internal void InvokeButtonUpAction(int mx, int my) 
+        {
+            _buttonUpAction?.Invoke(mx, my);
+        }
+
+        internal void InvokeMoveAction(int mx, int my) 
+        {
+            _moveAction?.Invoke(mx, my);
         }
     }
 }

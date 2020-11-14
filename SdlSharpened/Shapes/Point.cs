@@ -4,23 +4,13 @@ using SDL2;
 namespace SdlSharpened
 {
     /// <summary>
-    ///   Class represents a two-dimensional point in space.
+    ///   Represents a two-dimensional point in space.
     /// </summary>
     public struct Point
     {
         internal SDL.SDL_Point SdlPoint { get { return _sdlPoint; } }
 
         private SDL.SDL_Point _sdlPoint;
-
-        /// <summary>
-        ///   Creates a point with the specified X and Y values.
-        /// </summary>
-        /// <param name="pointX">The X value of the point.</param>
-        /// <param name="pointY">The Y value of the point.</param>
-        public Point(int pointX, int pointY)
-        {
-            _sdlPoint = new SDL.SDL_Point() { x = pointX, y = pointY };
-        }
 
         /// <summary>
         ///   The X position of the Point.
@@ -38,6 +28,16 @@ namespace SdlSharpened
         {
             get { return _sdlPoint.y; }
             set { _sdlPoint.y = value; }
+        }
+
+        /// <summary>
+        ///   Creates a point with the specified X and Y values.
+        /// </summary>
+        /// <param name="pointX">The X value of the point.</param>
+        /// <param name="pointY">The Y value of the point.</param>
+        public Point(int pointX, int pointY)
+        {
+            _sdlPoint = new SDL.SDL_Point() { x = pointX, y = pointY };
         }
     }
 }

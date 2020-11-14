@@ -8,6 +8,10 @@ namespace SdlSharpened
     /// </summary>
     public class Surface
     {
+        // The width and height of the surface
+        public int Width { get; }
+        public int Height { get; }
+
         /// <summary>
         ///   A pointer to the internal SDL_Surface.
         /// </summary>
@@ -26,6 +30,8 @@ namespace SdlSharpened
             uint amask = 0;
 
             Pointer = SDL.SDL_CreateRGBSurface(0, width, height, 32, rmask, gmask, bmask, amask);
+            Width = width;
+            Height = height;
         }
 
         /// <summary>
@@ -36,6 +42,8 @@ namespace SdlSharpened
         public Surface(string filePath)
         {
             Pointer = SDL_image.IMG_Load(filePath);
+            Width = 0;
+            Height = 0;
         }
 
         ~Surface() 

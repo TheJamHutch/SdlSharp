@@ -74,6 +74,11 @@ namespace SdlSharpened
             SDL.SDL_RenderCopy(Pointer, texture.Pointer, ref src, ref dst);
         }
 
+        public void CopyEx() 
+        {
+            //SDL.SDL_RenderCopyEx(Pointer, );
+        }
+
        /// <summary>
        ///   Performs a renderer present.
        /// </summary>
