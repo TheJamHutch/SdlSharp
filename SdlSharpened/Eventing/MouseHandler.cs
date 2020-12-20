@@ -3,7 +3,7 @@ using SDL2;
 
 namespace SdlSharpened
 {
-    public class MouseHandler : Handler
+    public class MouseHandler
     {
         private Action<int, int> _buttonDownAction;
         private Action<int, int> _buttonUpAction;
@@ -51,7 +51,7 @@ namespace SdlSharpened
             _wheelAction = action;
         }
 
-        internal override void PollEvents(SDL.SDL_Event sdlEvent) 
+        internal void PollEvents(SDL.SDL_Event sdlEvent) 
         {
             if (sdlEvent.type == SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN)
             {

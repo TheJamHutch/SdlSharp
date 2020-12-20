@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SdlSharpened", "SdlSharpene
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SdlSharpened.Test", "SdlSharpened.Test\SdlSharpened.Test.csproj", "{16E3D8C1-7D47-40CD-B044-E993D1AFE8BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SdlSharpened.App", "SdlSharpened.App\SdlSharpened.App.csproj", "{595AC261-9411-44D9-872C-EDD7D50DF977}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SdlSharpened.App", "SdlSharpened.App\SdlSharpened.App.csproj", "{595AC261-9411-44D9-872C-EDD7D50DF977}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1D51652F-E4F1-4FF0-B947-D8C90DA5BDB0}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -108,5 +108,10 @@ namespace SdlSharpened
 
             return (result == SDL.SDL_bool.SDL_TRUE) ? true : false;
         }
+
+        public override string ToString()
+        {
+            return $"X: {_sdlRect.x}, Y: {_sdlRect.y}, W: {_sdlRect.w}, H: {_sdlRect.h}";
+        }
     }
 }

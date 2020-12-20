@@ -3,13 +3,14 @@ using SDL2;
 
 namespace SdlSharpened
 {
+    // Don't allow user to construct Handlers directory, have a handler factory in this class.
+
     public static class Eventing
     {
         // Not good.
         internal static KeyboardHandler KeyboardHandlerInstance;
         internal static MouseHandler MouseHandlerInstance;
         internal static GamepadHandler GamepadHandlerInstance;
-        internal static JoystickHandler JoystickHandlerInstance;
 
         private static Action _quitAction;
 
@@ -37,7 +38,6 @@ namespace SdlSharpened
                 KeyboardHandlerInstance?.PollEvents(_sdlEvent);
                 MouseHandlerInstance?.PollEvents(_sdlEvent);
                 GamepadHandlerInstance?.PollEvents(_sdlEvent);
-                JoystickHandlerInstance?.PollEvents(_sdlEvent);
             }
         }
     }

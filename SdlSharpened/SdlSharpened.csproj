@@ -19,4 +19,7 @@
 	  <RepositoryUrl>https://github.com/TheJamHutch/SdlSharpened</RepositoryUrl>
 	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
 </Project>

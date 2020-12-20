@@ -3,6 +3,8 @@ using SDL2;
 
 namespace SdlSharpened
 {
+    // Make static?
+
     /// <summary>
     ///   Class represents the SDL system.
     /// </summary>
@@ -41,6 +43,11 @@ namespace SdlSharpened
             }
         }
 
+        public static uint Tickss() 
+        {
+            return SDL.SDL_GetTicks();
+        }
+
         /// <summary>
         ///   Gets the number of ticks since the SDL system was initialised.
         /// </summary>
@@ -54,7 +61,7 @@ namespace SdlSharpened
         ///   Gets the major, minor, and patch version numbers of the currently installed version of SDL2. 
         /// </summary>
         /// <returns>A formatted string representing the SDL version.</returns>
-        public string GetVersion()
+        public string Version()
         {
             SDL.SDL_GetVersion(out var sdlVersion);
             var imgVersion = SDL_image.IMG_Linked_Version();

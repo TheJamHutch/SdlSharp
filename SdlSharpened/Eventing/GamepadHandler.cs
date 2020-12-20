@@ -1,29 +1,43 @@
-﻿using SDL2;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using SDL2;
 
 namespace SdlSharpened
 {
-    public class GamepadHandler : Handler
+    public class GamepadHandler
     {
-        private Action _buttonDownAction;
-
-        private Action _buttonUpAction;
-
+        private Dictionary<GamepadButton, PressAction> _buttonpressRegistry;
         private Action _axisAction;
+
+        private IntPtr _sdlGameController;
+
+        private GamepadButton _lastPressed = GamepadButton.Btn_Invalid;
 
         public GamepadHandler()
         {
+            _buttonpressRegistry = new Dictionary<GamepadButton, PressAction>();
+            // TODO: Don't rely on the controller always being 0
+            _sdlGameController = SDL.SDL_GameControllerOpen(0);
             Eventing.GamepadHandlerInstance = this;
         }
 
-        public void OnButtonDown(Action action) 
+        // Close all SDL game controllers
+        ~GamepadHandler() 
         {
-            _buttonDownAction = action;
+            SDL.SDL_GameControllerClose(_sdlGameController);
         }
 
-        public void OnButtonUp(Action action) 
+        /// <summary>
+        ///   Returns the number of joysticks attached to the system.
+        /// </summary>
+        public int AttachedCount() 
         {
-            _buttonUpAction = action;
+            return SDL.SDL_NumJoysticks();
+        }
+
+        public void OnButtonpress(GamepadButton button, Action downAction, Action upAction = null) 
+        {
+            _buttonpressRegistry[button] = new PressAction(downAction, upAction);
         }
 
         public void OnAxis(Action action) 
@@ -31,19 +45,39 @@ namespace SdlSharpened
             _axisAction = action;
         }
 
-        internal override void PollEvents(SDL.SDL_Event sdlEvent)
+        internal void PollEvents(SDL.SDL_Event sdlEvent)
         {
             if (sdlEvent.type == SDL.SDL_EventType.SDL_CONTROLLERBUTTONDOWN)
-            { 
+            {
+                GamepadButton btnCode = GamepadButton.Btn_Invalid;
+
+                foreach (var enumVal in GamepadButtonExtension.GetValues())
+                {
+                    byte btnDown = SDL.SDL_GameControllerGetButton(_sdlGameController, enumVal.ToSdl());
+                    if (btnDown == 1)
+                    {
+                        btnCode = enumVal;
+                        break;
+                    }
+                }
+
+                if (_buttonpressRegistry.TryGetValue(btnCode, out var pressAction))
+                {
+                    pressAction.DownAction?.Invoke();
+                    _lastPressed = btnCode;
+                }
+                else 
+                {
+                    Console.WriteLine("Button not mapped");
+                }
+            }
             
-            }
-            else if (sdlEvent.type == SDL.SDL_EventType.SDL_CONTROLLERBUTTONUP)
-            {
-
-            }
-            else if (sdlEvent.type == SDL.SDL_EventType.SDL_CONTROLLERAXISMOTION)
-            {
-
+            if (sdlEvent.type == SDL.SDL_EventType.SDL_CONTROLLERBUTTONUP)
+            { 
+                if (_buttonpressRegistry.TryGetValue(_lastPressed, out var pressAction))
+                {
+                    pressAction.UpAction?.Invoke();
+                }
             }
         }
     }

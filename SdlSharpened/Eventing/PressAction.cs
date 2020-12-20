@@ -2,7 +2,7 @@
 
 namespace SdlSharpened
 {
-    public class KeyboardAction
+    public class PressAction
     {
         private static Action _noop = (() => { });
 
@@ -10,7 +10,7 @@ namespace SdlSharpened
 
         public Action UpAction { get; set; }
 
-        public KeyboardAction(Action downAction, Action upAction)
+        public PressAction(Action downAction, Action upAction)
         {
             DownAction = downAction ?? _noop;
             UpAction = upAction ?? _noop;

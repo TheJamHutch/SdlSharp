@@ -10,27 +10,27 @@ namespace SdlSharpened
         /// <summary>
         ///   Gets the number of CPU cores.
         /// </summary>
-        public static int CoreCount { get { return SDL.SDL_GetCPUCount(); } }
+        public static int CoreCount => SDL.SDL_GetCPUCount();
 
         /// <summary>
         ///   Gets the cache line size.
         /// </summary>
-        public static int CacheLineSize { get { return SDL.SDL_GetCPUCacheLineSize(); } }
+        public static int CacheLineSize => SDL.SDL_GetCPUCacheLineSize();
 
         /// <summary>
         ///   Gets the installed memory size in megabytes.
         /// </summary>
-        public static int Memoryinstalled { get { return SDL.SDL_GetSystemRAM(); } }
+        public static int MemoryInstalled => SDL.SDL_GetSystemRAM();
 
         /// <summary>
         /// 
         /// </summary>
-        public static string Platform { get { return SDL.SDL_GetPlatform(); } }
+        public static string Platform => SDL.SDL_GetPlatform();
 
         /// <summary>
         /// 
         /// </summary>
-        public static string PowerStatus { get { return GetPowerInfo(); } }
+        public static string PowerStatus => PowerDescription();
 
 
         /// <summary>
@@ -41,12 +41,12 @@ namespace SdlSharpened
         {
             return $"CPU Cores: {CoreCount}\n" +
                    $"Cache Line Size: {CacheLineSize} KB\n" +
-                   $"System RAM: {Memoryinstalled} MB\n" +
+                   $"System RAM: {MemoryInstalled} MB\n" +
                    $"Platform: {Platform}\n" +
                    $"Power Status: {PowerStatus}\n";
         }
 
-        private static string GetPowerInfo()
+        private static string PowerDescription()
         {
             var powerState = SDL.SDL_GetPowerInfo(out var secs, out var percent);
             string stateDesc = "";
