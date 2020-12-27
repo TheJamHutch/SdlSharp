@@ -15,13 +15,13 @@ namespace SdlSharpened.App
 
         public static readonly ColourType TransparentColour = ColourType.Magenta;
 
-        public static readonly int TilemapXtiles = 200;
-        public static readonly int TilemapYtiles = 200;
+        public static readonly int TilemapXtiles = 30;
+        public static readonly int TilemapYtiles = 20;
         public static readonly TileSize TilemapTileSize = TileSize.Medium;
 
         public static readonly string SpritesheetBaseTiles = "D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\img\\basetiles.bmp";
         public static readonly string SpritesheetTopTiles = "D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\img\\toptiles.bmp";
-
+        public static readonly string SpritesheetNumsheet = "D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\img\\numsheet.bmp";
         public static readonly string SpritesheetPlayer = "D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\img\\player.bmp";
 
         public static readonly string MapFolderPath = "D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\map";

@@ -38,26 +38,5 @@ namespace SdlSharpened.App
                 _srcRect.Y = ycell * _srcRect.H;
             }
         }
-
-        public void NextFrame() 
-        {
-            if (_srcRect.X >= _sheetSize.X - 64)
-            {
-                _srcRect.X = 0;
-
-                if (_srcRect.Y >= _sheetSize.Y - 64)
-                {
-                    _srcRect.Y = 0;
-                }
-                else 
-                {
-                    _srcRect.Y += 32;
-                }
-            }
-            else 
-            {
-                _srcRect.X += 32;
-            }
-        }
     }
 }

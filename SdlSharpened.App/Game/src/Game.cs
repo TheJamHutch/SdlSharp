@@ -14,11 +14,12 @@ namespace SdlSharpened.App
         private SdlSystem _system;
         private Window _window;
         private Renderer _renderer;
-        private KeyboardHandler _keyboardHandler;
-        private MouseHandler _mouseHandler;
-        private GamepadHandler _gamepadHandler;
+        private EventHandler _eventHandler;
+
+        private IntPtr _surface;
 
         // Game objects
+        private BitmapText _bitmapText;
         private Camera _camera;
         private Player _player;
         private ITilemap _tilemap;
@@ -31,32 +32,33 @@ namespace SdlSharpened.App
             _renderer = new Renderer(_window);
             RendererInstance = _renderer;
 
-            _keyboardHandler = new KeyboardHandler();
-            _mouseHandler = new MouseHandler();
-            _gamepadHandler = new GamepadHandler();
+            _eventHandler = new EventHandler();
 
             // Create in order: Tilemap -> Camera -> Player -> Enemies
+            _bitmapText = new BitmapText();
             _tilemap = new Tilemap();
             _camera = new Camera(_tilemap);
             _player = new Player(_tilemap, _camera);
 
             // Init eventing stuff
-            Eventing.OnQuit(() => Stop());
             InitKeypresses();
-            InitMouseActions();
-            InitGamepad();
+            //InitGamepad();
+
+            _surface = SDL2.SDL.SDL_LoadBMP(Config.SpritesheetNumsheet);
         }
 
         public void Update()
         {
-            _camera.Update();
+
             _player.Update();
+            _camera.Update();
         }
 
         public void Render()
         {
             _tilemap.Render(_camera);
             _player.Render();
+            _bitmapText.Render();
             _renderer.Present();
         }
 
@@ -75,7 +77,7 @@ namespace SdlSharpened.App
         {
             while (_running)
             {
-                Eventing.PollEvents();
+                _eventHandler.PollEvents();
 
                 int startTime = (int)SdlSystem.Tickss();
                 Update();
@@ -88,32 +90,30 @@ namespace SdlSharpened.App
                     timeDiff = 1;
                 }
 
+                Console.WriteLine($"FPS: {1000 / (Config.FrameDelay - timeDiff) - 1}");
+
                 _system.Delay(Config.FrameDelay - timeDiff); 
             }
         }
 
-        private void InitKeypresses() 
+        private void InitKeypresses()
         {
-            Action stopAction = () => { _camera.Direction = MoveDirection.Stopped; _player.Direction = MoveDirection.Stopped; };
+            Action stopAction = () => { _camera.Direction = MoveDirection.None; _player.Direction = MoveDirection.None; };
 
-            _keyboardHandler.OnKeypress(KeyboardKey.Key_Escape, () => Stop());
-            _keyboardHandler.OnKeypress(KeyboardKey.Key_F5, () => _tilemap.Save());
-            _keyboardHandler.OnKeypress(KeyboardKey.Key_F6, () => _tilemap.Load());
-            _keyboardHandler.OnKeypress(KeyboardKey.Key_W, 
+            _eventHandler.Keyboard.OnKeypress(Keycode.Key_Escape, () => Stop());
+            _eventHandler.Keyboard.OnKeypress(Keycode.Key_F5, () => _tilemap.Save());
+            _eventHandler.Keyboard.OnKeypress(Keycode.Key_F6, () => _tilemap.Load());
+            _eventHandler.Keyboard.OnKeypress(Keycode.Key_W,
                 () => { _camera.Direction = MoveDirection.North; _player.Direction = MoveDirection.North; }, stopAction);
-            _keyboardHandler.OnKeypress(KeyboardKey.Key_D,
+            _eventHandler.Keyboard.OnKeypress(Keycode.Key_D,
                 () => { _camera.Direction = MoveDirection.East; _player.Direction = MoveDirection.East; }, stopAction);
-            _keyboardHandler.OnKeypress(KeyboardKey.Key_S,
+            _eventHandler.Keyboard.OnKeypress(Keycode.Key_S,
                 () => { _camera.Direction = MoveDirection.South; _player.Direction = MoveDirection.South; }, stopAction);
-            _keyboardHandler.OnKeypress(KeyboardKey.Key_A,
+            _eventHandler.Keyboard.OnKeypress(Keycode.Key_A,
                 () => { _camera.Direction = MoveDirection.West; _player.Direction = MoveDirection.West; }, stopAction);
         }
 
-        private void InitMouseActions() 
-        {
-
-        }
-
+        /*
         private void InitGamepad() 
         {
             _gamepadHandler.OnButtonpress(GamepadButton.Btn_A, () => { Console.WriteLine("A Down!"); });
@@ -123,7 +123,7 @@ namespace SdlSharpened.App
             _gamepadHandler.OnButtonpress(GamepadButton.Btn_X, () => { Console.WriteLine("X Down!"); });
             _gamepadHandler.OnButtonpress(GamepadButton.Btn_Y, () => { Console.WriteLine("Y Down!"); });
 
-            Action stopAction = () => { _camera.Direction = MoveDirection.Stopped; _player.Direction = MoveDirection.Stopped; };
+            Action stopAction = () => { _camera.Direction = MoveDirection.None; _player.Direction = MoveDirection.None; };
 
             _gamepadHandler.OnButtonpress(GamepadButton.Dpad_Up, 
                 () => { _camera.Direction = MoveDirection.North; _player.Direction = MoveDirection.North; }, stopAction);
@@ -133,6 +133,6 @@ namespace SdlSharpened.App
                 () => { _camera.Direction = MoveDirection.West; _player.Direction = MoveDirection.West; }, stopAction);
             _gamepadHandler.OnButtonpress(GamepadButton.Dpad_Right, 
                 () => { _camera.Direction = MoveDirection.East; _player.Direction = MoveDirection.East; }, stopAction);
-        }
+        }*/
     }
 }

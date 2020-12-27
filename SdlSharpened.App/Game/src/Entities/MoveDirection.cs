@@ -2,7 +2,7 @@
 {
     public enum MoveDirection
     {
-        Stopped = 0,
+        None = 0,
         North,
         East,
         South,
@@ -15,7 +15,7 @@
         {
             switch (moveDirection)
             {
-                case MoveDirection.Stopped:
+                case MoveDirection.None:
                     xVel = 0;
                     yVel = 0;
                     break;

@@ -10,13 +10,15 @@ namespace SdlSharpened.App
         public MoveDirection Direction { get { return _moveDirection; } set { _moveDirection = value; } }
         public MoveSpeed Speed { get { return _moveSpeed; } set { _moveSpeed = value; } }
 
-        public bool Locked { get { return _locked; } set { _locked = value; } }
+        public bool LockN { get; set; } = false;
+        public bool LockE { get; set; } = false; 
+        public bool LockS { get; set; } = false; 
+        public bool LockW { get; set; } = false;
 
         private Rect _worldRect;
         private Rect _viewRect;
         private MoveSpeed _moveSpeed = MoveSpeed.Slow;
-        private MoveDirection _moveDirection = MoveDirection.Stopped;
-        private bool _locked = false;
+        private MoveDirection _moveDirection = MoveDirection.None;
         private ITilemap _tilemap;
 
         public Camera(ITilemap tilemap)
@@ -28,31 +30,44 @@ namespace SdlSharpened.App
 
         public void Update()
         {
-            Move();
+            _moveDirection.SetVelocities(out var xVel, out var yVel);
+            Collision(ref xVel, ref yVel);
+            Move(xVel, yVel);
         }
 
-        void Move() 
+        private void Collision(ref int xVel, ref int yVel) 
         {
-            _moveDirection.SetVelocities(out var xVel, out var yVel);
-
             // Stop camera going off edge of tilemap
-            if ( ((_worldRect.Y <= 0) && (_moveDirection == MoveDirection.North)) || 
-                 ((_worldRect.Y + _worldRect.H >= _tilemap.Resolution.Y - 32) && (_moveDirection == MoveDirection.South)) )
+            if ((_worldRect.Y <= 0) && (_moveDirection == MoveDirection.North))
             {
+                LockN = true;
                 yVel = 0;
-                _locked = true;
             }
-            else if ( ((_worldRect.X <= 0) && (_moveDirection == MoveDirection.West)) || 
-                      ((_worldRect.X + _worldRect.W >= _tilemap.Resolution.X - 32) && (_moveDirection == MoveDirection.East)) )
+            else if ((_worldRect.Y + _worldRect.H >= (_tilemap.Resolution.Y - (int)Config.TilemapTileSize)) && (_moveDirection == MoveDirection.South))
             {
-                xVel = 0;
-                _locked = true;
+                LockS = true;
+                yVel = 0;
             }
+            if (((_worldRect.X <= 0) && (_moveDirection == MoveDirection.West)))
+            {
+                LockW = true; Console.WriteLine("CAMERA COLLIDED WEST");
+                xVel = 0;
+            }
+            else if ((_worldRect.X + _worldRect.W >= (_tilemap.Resolution.X - (int)Config.TilemapTileSize)) && (_moveDirection == MoveDirection.East))
+            {
+                LockE = true;
+                xVel = 0;
+            }
+        }
 
-
-            if (!_locked)
+        void Move(int xVel, int yVel)
+        {
+            if (!LockW)
             {
                 _worldRect.X += xVel * (int)_moveSpeed;
+            }
+            if (!LockN && !LockS)
+            {
                 _worldRect.Y += yVel * (int)_moveSpeed;
             }
         }

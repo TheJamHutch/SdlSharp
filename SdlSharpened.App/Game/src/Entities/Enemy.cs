@@ -12,7 +12,7 @@ namespace SdlSharpened.App
 
         private Rect _worldRect;
         private Rect _viewRect;
-        private MoveDirection _moveDirection = MoveDirection.Stopped;
+        private MoveDirection _moveDirection = MoveDirection.None;
         private MoveSpeed _moveSpeed = MoveSpeed.Slow;
         private SpriteSheet _spriteSheet;
 

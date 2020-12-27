@@ -64,8 +64,6 @@ namespace SdlSharpened.App
             bool collide = false;
             var playerTile = TileFromPos(camera, player);
 
-            Console.WriteLine("Pos: " + PosFromTile(playerTile).ToString());
-
             int[,] localTiles = new int[3, 3];
             localTiles = _topTilemapLayer.LocalTiles(playerTile);
 
