@@ -17,10 +17,7 @@ namespace SdlSharpened
             _event = new Event();
             _keyboardHandler = new KeyboardHandler();
         }
-
-        /// <summary>
-        ///   
-        /// </summary>
+        
         public void PollEvents()
         {
             while (_event.Poll() != 0)

@@ -10,7 +10,7 @@ namespace SdlSharpened
 
         public Action UpAction { get; set; }
 
-        public PressAction(Action downAction, Action upAction)
+        public PressAction(Action downAction, Action upAction = null)
         {
             DownAction = downAction ?? _noop;
             UpAction = upAction ?? _noop;

@@ -9,7 +9,7 @@ namespace SdlSharpened.App
     public class BitmapText
     {
         private Texture _sheetTexture;
-        private Texture _dstTexture;
+       // private Texture _dstTexture;
         private Rect _srcRect;
         private Rect _dstRect;
         private string _value = "721457432";
@@ -31,31 +31,27 @@ namespace SdlSharpened.App
         public BitmapText()
         {
             _sheetTexture = new Texture(Config.SpritesheetNumsheet, ColourType.Magenta);
-            _dstTexture = new Texture(640, 480);
+            //_dstTexture = new Texture(640, 480);
             _srcRect = new Rect(0, 0, 32, 32);
             _dstRect = new Rect(0, 0, 32, 32);
-
-            //PreRender();
         }
 
-        public void Render() 
+        public void Render()
         {
-            // Game.RendererInstance.Copy(_dstTexture, _srcRect, _dstRect);
-        }
-
-        private void PreRender()
-        {
-            Game.RendererInstance.SetTarget(_dstTexture);
-
+            _dstRect.X = 0;
             var textChars = _value.ToCharArray();
             foreach (char ch in textChars)
             {
                 _srcRect = SetSrcRect(ch);
+                _srcRect = SetSrcRect(ch);
                 Game.RendererInstance.Copy(_sheetTexture, _srcRect, _dstRect);
                 _dstRect.X += 32;
             }
+        }
 
-             Game.RendererInstance.ResetTarget();
+        public void SetValue(int val) 
+        {
+            _value = val.ToString();
         }
 
         private void Update() 

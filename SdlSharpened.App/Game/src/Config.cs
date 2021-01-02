@@ -23,6 +23,7 @@ namespace SdlSharpened.App
         public static readonly string SpritesheetTopTiles = "D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\img\\toptiles.bmp";
         public static readonly string SpritesheetNumsheet = "D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\img\\numsheet.bmp";
         public static readonly string SpritesheetPlayer = "D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\img\\player.bmp";
+        public static readonly string SpritesheetSlime = "D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\img\\slime.bmp";
 
         public static readonly string MapFolderPath = "D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\map";
 

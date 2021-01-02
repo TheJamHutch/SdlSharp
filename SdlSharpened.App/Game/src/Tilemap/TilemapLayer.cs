@@ -7,7 +7,8 @@ namespace SdlSharpened.App
     {
         private const int EMPTY_TILE = -1;
 
-        private int[ , ] _tileGrid;
+        // TODO: Should not be public
+        public int[ , ] _tileGrid;
         private int _xTiles;
         private int _yTiles;
         private TileSize _tileSize;
@@ -52,6 +53,7 @@ namespace SdlSharpened.App
             
             int startX = cameraRect.X / (int)_tileSize;
             int startY = cameraRect.Y / (int)_tileSize;
+            // Over-render by one tile
             int endX = startX + (cameraRect.W / (int)_tileSize) + 1;
             int endY = startY + (cameraRect.H / (int)_tileSize) + 1;
 
@@ -178,34 +180,6 @@ namespace SdlSharpened.App
             }
 
             _tileSheet.SetFrame(row, col);
-        }
-
-        public int[,] LocalTiles(Point tilePos) 
-        {
-            int startX = tilePos.X - 1;
-            int startY = tilePos.Y - 1;
-            int endX = tilePos.X + 1;
-            int endY = tilePos.Y + 1;
-
-            int[,] localTiles = new int[3, 3];
-            int lx = 0;
-            int ly = 0;
-            for (int y = startY; y <= endY; y++)
-            {
-                for (int x = startX; x <= endX; x++)
-                {
-                    localTiles[lx, ly] = _tileGrid[x, y];
-                    Console.Write(localTiles[lx, ly] + ", ");
-
-                    lx += 1;
-                }
-                ly += 1;
-                lx = 0;
-                Console.WriteLine();
-            }
-            Console.WriteLine("\n");
-
-            return localTiles;
         }
     }
 }

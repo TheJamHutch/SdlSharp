@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using SdlSharpened;
 
@@ -59,53 +58,41 @@ namespace SdlSharpened.App
             _topTilemapLayer.Render(camera.WorldRect);
         }
 
-        public bool Collision(Camera camera, Player player) 
+        public int[,] LocalTiles(Point pos)
         {
-            bool collide = false;
-            var playerTile = TileFromPos(camera, player);
+            Point tile = TileFromPos(pos, (int)_tileSize);
 
-            int[,] localTiles = new int[3, 3];
-            localTiles = _topTilemapLayer.LocalTiles(playerTile);
+            int startX = (tile.X > 0) ? tile.X - 1 : 0;
+            int startY = (tile.Y > 0) ? tile.Y - 1 : 0;
+            int endX = (tile.X < _area.X - 1) ? tile.X + 1 : tile.X;
+            int endY = (tile.Y < _area.Y - 1) ? tile.Y + 1 : tile.Y;
 
-            const int EMPTY_TILE = -1;
-
-            if ( (localTiles[1, 0] > EMPTY_TILE && player.Direction == MoveDirection.North) ||
-                 (localTiles[2, 1] > EMPTY_TILE && player.Direction == MoveDirection.East)  ||
-                 (localTiles[1, 2] > EMPTY_TILE && player.Direction == MoveDirection.South) ||
-                 (localTiles[0, 1] > EMPTY_TILE && player.Direction == MoveDirection.West)   )
+            int[ , ] localTiles = new int[3, 3];
+            int lx = 0;
+            int ly = 0;
+            for (int y = startY; y <= endY; y++)
             {
-                collide = true;
+                for (int x = startX; x <= endX; x++)
+                {
+                    localTiles[lx, ly] = _topTilemapLayer._tileGrid[x, y];
+                    lx += 1;
+                }
+                ly += 1;
+                lx = 0;
             }
 
-            return collide;
+            return localTiles;
         }
 
-        // Gets the current X and Y tile from the camera position
-        private Point TileFromPos(Camera camera, Player player)
+        // Gets the current XY tile from a world position
+        private Point TileFromPos(Point pos, int tileSize)
         {
-            int tileX = 0;
-            int tileY = 0;
-
-            int camX = camera.WorldRect.X;
-            int camY = camera.WorldRect.Y;
-
-            int plrX = player.ViewRect.X;
-            int plrY = player.ViewRect.Y;
-
-            tileX = (camX + (plrX + 16)) / 32;
-            tileY = (camY + (plrY + 16)) / 32;
-
-            return new Point(tileX, tileY);
+            return new Point() { X = pos.X / tileSize, Y = pos.Y / tileSize };
         }
 
-        private Point PosFromTile(Point tile)
+        private Point PosFromTile(Point tile, int tileSize)
         {
-            Point pos = new Point();
-
-            pos.X = tile.X * (int)_tileSize;
-            pos.Y = tile.Y * (int)_tileSize;
-
-            return pos;
+            return new Point() { X = tile.X * tileSize, Y = tile.Y * tileSize };
         }
     }
 }

@@ -61,9 +61,14 @@ namespace SdlSharpened
         Key_F9, Key_F10, Key_F11, Key_F12
     }
 
-    public static class KeycodeExtension
+    public static class KeycodeEx
     {
-        public static Keycode MapSdlKeycode(SDL.SDL_Keycode sdlKey)
+        public static SDL.SDL_Keycode ToSdl(this Keycode keycode)
+        {
+            return (SDL.SDL_Keycode)keycode;
+        }
+
+        public static Keycode FromSdl (SDL.SDL_Keycode sdlKey)
         {
             Keycode key;
 
@@ -183,16 +188,5 @@ namespace SdlSharpened
 
             return key;
         }
-
-        /*
-        public static SDL.SDL_Keycode ToSdl(this Keycode keycode)
-        {
-            return (SDL.SDL_Keycode)keycode;
-        }
-
-        public static Keycode FromSdl(SDL.SDL_Keycode sdlKeycode) 
-        {
-            return (Keycode)sdlKeycode;
-        }*/
     }
 }

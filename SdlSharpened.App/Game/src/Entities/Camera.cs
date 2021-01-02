@@ -31,6 +31,7 @@ namespace SdlSharpened.App
         public void Update()
         {
             _moveDirection.SetVelocities(out var xVel, out var yVel);
+
             Collision(ref xVel, ref yVel);
             Move(xVel, yVel);
         }
@@ -50,7 +51,7 @@ namespace SdlSharpened.App
             }
             if (((_worldRect.X <= 0) && (_moveDirection == MoveDirection.West)))
             {
-                LockW = true; Console.WriteLine("CAMERA COLLIDED WEST");
+                LockW = true;
                 xVel = 0;
             }
             else if ((_worldRect.X + _worldRect.W >= (_tilemap.Resolution.X - (int)Config.TilemapTileSize)) && (_moveDirection == MoveDirection.East))
@@ -62,7 +63,7 @@ namespace SdlSharpened.App
 
         void Move(int xVel, int yVel)
         {
-            if (!LockW)
+            if (!LockW && !LockE)
             {
                 _worldRect.X += xVel * (int)_moveSpeed;
             }

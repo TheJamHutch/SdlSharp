@@ -13,7 +13,7 @@ namespace SdlSharpened.App
 
         void Load();
 
-        bool Collision(Camera camera, Player player);
+        int[ , ] LocalTiles(Point tilePos);
 
         void Render(Camera camera);
     }

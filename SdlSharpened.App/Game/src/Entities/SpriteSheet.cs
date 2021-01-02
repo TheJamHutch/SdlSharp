@@ -9,7 +9,7 @@ namespace SdlSharpened.App
         public Rect SheetFrame { get { return _srcRect; } }
 
         private Texture _texture;
-        private Rect _srcRect;
+        public Rect _srcRect;
         private Point _sheetSize;
 
         public SpriteSheet(string path, Point frameSize)

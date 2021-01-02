@@ -23,13 +23,17 @@ namespace SdlSharpened
         /// </summary>
         public IntPtr Pointer { get; }
 
+        private IntPtr _sdlTexture;
+
         /// <summary>
         ///   Creates a texture from an image file. 24-bit BMP only.
         /// </summary>
         /// <param name="filePath">The filepath of the image file.</param>
         public Texture(string filePath)
         {
-            Pointer = SDL_image.IMG_LoadTexture(SdlSystem.RendererPointer, filePath);
+            var surface = SDL.SDL_LoadBMP(filePath);
+            Pointer = SDL.SDL_CreateTextureFromSurface(SdlSystem.RendererPointer, surface);
+            SDL.SDL_FreeSurface(surface);
         }
 
         /// <summary>

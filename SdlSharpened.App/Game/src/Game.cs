@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SdlSharpened;
 
 namespace SdlSharpened.App
@@ -16,12 +17,11 @@ namespace SdlSharpened.App
         private Renderer _renderer;
         private EventHandler _eventHandler;
 
-        private IntPtr _surface;
-
         // Game objects
         private BitmapText _bitmapText;
         private Camera _camera;
         private Player _player;
+        private Enemy _enemy;
         private ITilemap _tilemap;
 
         public Game()
@@ -39,17 +39,31 @@ namespace SdlSharpened.App
             _tilemap = new Tilemap();
             _camera = new Camera(_tilemap);
             _player = new Player(_tilemap, _camera);
+            _enemy = new Enemy(_tilemap, _camera);
 
             // Init eventing stuff
-            InitKeypresses();
-            //InitGamepad();
+            Action stopAction = () => { _camera.Direction = MoveDirection.None; _player.Direction = MoveDirection.None; };
+            var keypressActions = new List<KeyValuePair<Keycode, PressAction>>()
+            {
+                new KeyValuePair<Keycode, PressAction>(Keycode.Key_Escape, new PressAction(() => Stop())),
+                new KeyValuePair<Keycode, PressAction>(Keycode.Key_F5, new PressAction(() => _tilemap.Save())),
+                new KeyValuePair<Keycode, PressAction>(Keycode.Key_F6, new PressAction(() => _tilemap.Load())),
+                new KeyValuePair<Keycode, PressAction>(Keycode.Key_W, new PressAction(
+                    () => { _camera.Direction = MoveDirection.North;  _player.Direction = MoveDirection.North; }, stopAction)),
+                new KeyValuePair<Keycode, PressAction>(Keycode.Key_D, new PressAction(
+                    () => { _camera.Direction = MoveDirection.East;  _player.Direction = MoveDirection.East; }, stopAction)),
+                new KeyValuePair<Keycode, PressAction>(Keycode.Key_S, new PressAction(
+                    () => { _camera.Direction = MoveDirection.South;  _player.Direction = MoveDirection.South; }, stopAction)),
+                new KeyValuePair<Keycode, PressAction>(Keycode.Key_A, new PressAction(
+                    () => { _camera.Direction = MoveDirection.West;  _player.Direction = MoveDirection.West; }, stopAction)),
+            };
 
-            _surface = SDL2.SDL.SDL_LoadBMP(Config.SpritesheetNumsheet);
+            _eventHandler.Keyboard.BindKeypressActions(keypressActions);
         }
 
         public void Update()
         {
-
+            _enemy.Update();
             _player.Update();
             _camera.Update();
         }
@@ -57,6 +71,7 @@ namespace SdlSharpened.App
         public void Render()
         {
             _tilemap.Render(_camera);
+            _enemy.Render();
             _player.Render();
             _bitmapText.Render();
             _renderer.Present();
@@ -79,10 +94,10 @@ namespace SdlSharpened.App
             {
                 _eventHandler.PollEvents();
 
-                int startTime = (int)SdlSystem.Tickss();
+                int startTime = (int)Timing.Ticks();
                 Update();
                 Render();
-                int endTime = (int)_system.Ticks();
+                int endTime = (int)Timing.Ticks();
                 int timeDiff = endTime - startTime;
                 // Wait for the shortest possible time if frame took too long to draw
                 if (timeDiff > Config.FrameDelay)
@@ -90,49 +105,11 @@ namespace SdlSharpened.App
                     timeDiff = 1;
                 }
 
-                Console.WriteLine($"FPS: {1000 / (Config.FrameDelay - timeDiff) - 1}");
+                int fps = 1000 / (Config.FrameDelay - timeDiff) - 1;
+                _bitmapText.SetValue(fps); 
 
-                _system.Delay(Config.FrameDelay - timeDiff); 
+                Timing.Delay((uint)(Config.FrameDelay - timeDiff)); 
             }
         }
-
-        private void InitKeypresses()
-        {
-            Action stopAction = () => { _camera.Direction = MoveDirection.None; _player.Direction = MoveDirection.None; };
-
-            _eventHandler.Keyboard.OnKeypress(Keycode.Key_Escape, () => Stop());
-            _eventHandler.Keyboard.OnKeypress(Keycode.Key_F5, () => _tilemap.Save());
-            _eventHandler.Keyboard.OnKeypress(Keycode.Key_F6, () => _tilemap.Load());
-            _eventHandler.Keyboard.OnKeypress(Keycode.Key_W,
-                () => { _camera.Direction = MoveDirection.North; _player.Direction = MoveDirection.North; }, stopAction);
-            _eventHandler.Keyboard.OnKeypress(Keycode.Key_D,
-                () => { _camera.Direction = MoveDirection.East; _player.Direction = MoveDirection.East; }, stopAction);
-            _eventHandler.Keyboard.OnKeypress(Keycode.Key_S,
-                () => { _camera.Direction = MoveDirection.South; _player.Direction = MoveDirection.South; }, stopAction);
-            _eventHandler.Keyboard.OnKeypress(Keycode.Key_A,
-                () => { _camera.Direction = MoveDirection.West; _player.Direction = MoveDirection.West; }, stopAction);
-        }
-
-        /*
-        private void InitGamepad() 
-        {
-            _gamepadHandler.OnButtonpress(GamepadButton.Btn_A, () => { Console.WriteLine("A Down!"); });
-            _gamepadHandler.OnButtonpress(GamepadButton.Btn_B, 
-                () => { _camera.Speed = MoveSpeed.Fast;  _player.Speed = MoveSpeed.Fast; },
-                () => { _camera.Speed = MoveSpeed.Slow; _player.Speed = MoveSpeed.Slow; });
-            _gamepadHandler.OnButtonpress(GamepadButton.Btn_X, () => { Console.WriteLine("X Down!"); });
-            _gamepadHandler.OnButtonpress(GamepadButton.Btn_Y, () => { Console.WriteLine("Y Down!"); });
-
-            Action stopAction = () => { _camera.Direction = MoveDirection.None; _player.Direction = MoveDirection.None; };
-
-            _gamepadHandler.OnButtonpress(GamepadButton.Dpad_Up, 
-                () => { _camera.Direction = MoveDirection.North; _player.Direction = MoveDirection.North; }, stopAction);
-            _gamepadHandler.OnButtonpress(GamepadButton.Dpad_Down, 
-                () => { _camera.Direction = MoveDirection.South; _player.Direction = MoveDirection.South; }, stopAction);
-            _gamepadHandler.OnButtonpress(GamepadButton.Dpad_Left, 
-                () => { _camera.Direction = MoveDirection.West; _player.Direction = MoveDirection.West; }, stopAction);
-            _gamepadHandler.OnButtonpress(GamepadButton.Dpad_Right, 
-                () => { _camera.Direction = MoveDirection.East; _player.Direction = MoveDirection.East; }, stopAction);
-        }*/
     }
 }

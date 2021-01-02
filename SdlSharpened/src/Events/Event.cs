@@ -12,12 +12,12 @@ namespace SdlSharpened
     {
         public EventType Type { get { return (EventType)_sdlEvent.type; } }
 
-        public SDL.SDL_Keycode Keycode { get { return _sdlEvent.key.keysym.sym; } }
+        public Keycode Keycode { get { return KeycodeEx.FromSdl(_sdlEvent.key.keysym.sym); } }
 
         // The internal SDL_Event structure.
         private SDL.SDL_Event _sdlEvent = new SDL.SDL_Event();
 
-        public int Poll() 
+        public int Poll()
         {
             return SDL.SDL_PollEvent(out _sdlEvent);
         }

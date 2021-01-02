@@ -22,31 +22,33 @@ namespace SdlSharpened
         /// <param name="key">A KeyType enum value representing the key that was pressed.</param>
         /// <param name="downAction">The action to invoke when a key down event occurs.</param>
         /// <param name="upAction">The action to invoke when a key up event occurs.</param>
-        public void OnKeypress(Keycode key, Action downAction, Action upAction = null)
+        public void OnKeypress(Keycode key, PressAction pressAction)
         {
-            _keypressRegistry[key] = new PressAction(downAction, upAction);
+            _keypressRegistry[key] = new PressAction(pressAction.DownAction, pressAction.UpAction);
+        }
+
+        public void BindKeypressActions(IEnumerable<KeyValuePair<Keycode, PressAction>> keypressActions) 
+        {
+            foreach (var keyAct in keypressActions)
+            {
+                _keypressRegistry.Add(keyAct.Key, keyAct.Value);
+            }
         }
 
         public void PollEvents(Event pollEvent) 
         {
             if (pollEvent.Type == EventType.KeyDown)
             {
-                var sdlKey = pollEvent.Keycode;
-                var key = KeycodeExtension.MapSdlKeycode(sdlKey);
-
-                if (_keypressRegistry.TryGetValue(key, out var action))
+                if (_keypressRegistry.TryGetValue(pollEvent.Keycode, out var keypressAction))
                 {
-                    action.DownAction?.Invoke();
+                    keypressAction.DownAction?.Invoke();
                 }
             }
             else if (pollEvent.Type == EventType.KeyUp)
             {
-                var sdlKey = pollEvent.Keycode;
-                var key = KeycodeExtension.MapSdlKeycode(sdlKey);
-
-                if (_keypressRegistry.TryGetValue(key, out var action))
+                if (_keypressRegistry.TryGetValue(pollEvent.Keycode, out var keypressAction))
                 {
-                    action.UpAction?.Invoke();
+                    keypressAction.UpAction?.Invoke();
                 }
             }
         }

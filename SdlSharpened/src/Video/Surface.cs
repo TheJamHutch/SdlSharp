@@ -31,7 +31,7 @@ namespace SdlSharpened
         /// <summary>
         ///   A pointer to the internal SDL_Surface struct.
         /// </summary>
-        public IntPtr SdlSurface { get { return _sdlPointer; } }
+        public IntPtr SdlSurface { get { return _sdlSurface; } }
 
         // Private backing fields.
         private int _width;
@@ -40,9 +40,9 @@ namespace SdlSharpened
         private int _refCount;
 
         // The internal SDL_Surface structure.
-        private IntPtr _sdlPointer;
+        private IntPtr _sdlSurface;
 
-        private SDL.SDL_Surface _sdlSurface = new SDL.SDL_Surface();
+        //private SDL.SDL_Surface _sdlSurface = new SDL.SDL_Surface();
 
         /// <summary>
         ///   Creates a blank surface of specified width and height.
@@ -56,11 +56,9 @@ namespace SdlSharpened
             uint bmask = 0;
             uint amask = 0;
 
-            _sdlPointer = SDL.SDL_CreateRGBSurface(0, width, height, 32, rmask, gmask, bmask, amask);
+            _sdlSurface = SDL.SDL_CreateRGBSurface(0, width, height, 32, rmask, gmask, bmask, amask);
             _width = width;
             _height = height;
-
-
         }
 
         /// <summary>
@@ -70,14 +68,14 @@ namespace SdlSharpened
         /// <param name="filePath">The path to the image file.</param>
         public Surface(string filePath)
         {
-            _sdlPointer = SDL.SDL_LoadBMP(filePath);
+            _sdlSurface = SDL.SDL_LoadBMP(filePath);
             _width = 0;
             _height = 0;
         }
 
         ~Surface() 
         {
-            SDL.SDL_FreeSurface(_sdlPointer);
+            SDL.SDL_FreeSurface(_sdlSurface);
         }
 
         /// <summary>
@@ -86,7 +84,7 @@ namespace SdlSharpened
         /// <param name="tspCol">Colour type enum representing the tranparency colour key.</param>
         public void SetTransparentColour(ColourType tspCol)
         {
-            SDL.SDL_SetColorKey(_sdlPointer, 1, tspCol.ColourKey());
+            SDL.SDL_SetColorKey(_sdlSurface, 1, tspCol.ColourKey());
         }
 
         /// <summary>
@@ -95,37 +93,37 @@ namespace SdlSharpened
         /// <returns>A ColourType enum value.</returns>
         public ColourType GetTransparentColour()
         {
-            SDL.SDL_GetColorKey(_sdlPointer, out var key);
+            SDL.SDL_GetColorKey(_sdlSurface, out var key);
 
             return ColourType.Black;
         }
 
         public bool MustLock() 
         {
-            return SDL.SDL_MUSTLOCK(_sdlPointer);
+            return SDL.SDL_MUSTLOCK(_sdlSurface);
         }
 
         public int Lock() 
         {
-            return SDL.SDL_LockSurface(_sdlPointer);
+            return SDL.SDL_LockSurface(_sdlSurface);
         }
 
         public void Unlock()
         {
-            SDL.SDL_UnlockSurface(_sdlPointer);
+            SDL.SDL_UnlockSurface(_sdlSurface);
         }
 
         public void LoadFromBMP(string bmpPath) 
         {
-            SDL.SDL_FreeSurface(_sdlPointer);
-            _sdlPointer = SDL.SDL_LoadBMP(bmpPath);
+            SDL.SDL_FreeSurface(_sdlSurface);
+            _sdlSurface = SDL.SDL_LoadBMP(bmpPath);
             _width = 999;
             _height = 999;
         }
 
         public void SaveToBmp(string bmpPath) 
         {
-            SDL.SDL_SaveBMP(_sdlPointer, bmpPath);
+            SDL.SDL_SaveBMP(_sdlSurface, bmpPath);
         }
     }
 }
