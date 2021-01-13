@@ -9,7 +9,6 @@ namespace SdlSharpened
 
         private Event _event;
         private KeyboardHandler _keyboardHandler;
-        private MouseHandler _mouseHandler;
         private GamepadHandler _gamepadHandler;
 
         public EventHandler()
@@ -23,7 +22,6 @@ namespace SdlSharpened
             while (_event.Poll() != 0)
             {
                 _keyboardHandler?.PollEvents(_event);
-                _mouseHandler?.PollEvents(_event);
                 _gamepadHandler?.PollEvents(_event);
             }
         }

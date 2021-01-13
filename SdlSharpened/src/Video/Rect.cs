@@ -61,6 +61,11 @@ namespace SdlSharpened
             _sdlRect = new SDL.SDL_Rect() { x = xpos, y = ypos, w = width, h = height };
         }
 
+        public Rect(Rect rect)
+        {
+            _sdlRect = new SDL.SDL_Rect() { x = rect.X, y = rect.Y, w = rect.W, h = rect.H };
+        }
+
         /// <summary>
         ///   Swaps the width and height values of the Rect.
         /// </summary>

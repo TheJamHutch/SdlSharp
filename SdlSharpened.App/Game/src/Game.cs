@@ -10,6 +10,7 @@ namespace SdlSharpened.App
         public static Renderer RendererInstance;
 
         private bool _running;
+        private int _frameDelay;
 
         // SdlSharpened objects
         private SdlSystem _system;
@@ -22,24 +23,26 @@ namespace SdlSharpened.App
         private Camera _camera;
         private Player _player;
         private Enemy _enemy;
-        private ITilemap _tilemap;
+        private Tilemap _tilemap;
 
-        public Game()
+        public Game(GameConfig gameConfig)
         {
             // Instantiate game objects
             _system = new SdlSystem();
-            _window = new Window(Config.WindowTitle, Config.WindowXres, Config.WindowYres);
+            _window = new Window(gameConfig.WindowTitle, gameConfig.WindowResX, gameConfig.WindowResY);
             _renderer = new Renderer(_window);
             RendererInstance = _renderer;
-
             _eventHandler = new EventHandler();
+            _bitmapText = new BitmapText();
 
             // Create in order: Tilemap -> Camera -> Player -> Enemies
-            _bitmapText = new BitmapText();
-            _tilemap = new Tilemap();
-            _camera = new Camera(_tilemap);
-            _player = new Player(_tilemap, _camera);
-            _enemy = new Enemy(_tilemap, _camera);
+            var camRect = new Rect(10, 10, gameConfig.WindowResX, gameConfig.WindowResY);
+            _tilemap = new Tilemap("D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\img\\basetiles.bmp", gameConfig.TilesX, gameConfig.TilesY, gameConfig.TilePixels, camRect);
+            _camera = new Camera(_tilemap, camRect);
+            _player = new Player(_tilemap, _camera, new Rect(344, 224, 32, 32));
+            //_enemy = new Enemy(_tilemap, _camera);
+
+            _frameDelay = 1000 / gameConfig.TargetFps;
 
             // Init eventing stuff
             Action stopAction = () => { _camera.Direction = MoveDirection.None; _player.Direction = MoveDirection.None; };
@@ -63,17 +66,18 @@ namespace SdlSharpened.App
 
         public void Update()
         {
-            _enemy.Update();
+            //_enemy.Update();
             _player.Update();
             _camera.Update();
         }
 
         public void Render()
         {
-            _tilemap.Render(_camera);
-            _enemy.Render();
+            _renderer.FillRect(_camera.ViewRect, ColourType.Black);
+             _tilemap.Render(_camera.WorldRect);
+            //_enemy.Render();
             _player.Render();
-            _bitmapText.Render();
+            //_bitmapText.Render();
             _renderer.Present();
         }
 
@@ -100,15 +104,12 @@ namespace SdlSharpened.App
                 int endTime = (int)Timing.Ticks();
                 int timeDiff = endTime - startTime;
                 // Wait for the shortest possible time if frame took too long to draw
-                if (timeDiff > Config.FrameDelay)
+                if (timeDiff > _frameDelay)
                 {
                     timeDiff = 1;
                 }
 
-                int fps = 1000 / (Config.FrameDelay - timeDiff) - 1;
-                _bitmapText.SetValue(fps); 
-
-                Timing.Delay((uint)(Config.FrameDelay - timeDiff)); 
+                Timing.Delay((uint)(33 - timeDiff)); 
             }
         }
     }

@@ -8,8 +8,8 @@ namespace SdlSharpened.App
     {
         VerySlow = 2,
         Slow = 4,
-        Medium = 6,
-        Fast = 8,
-        VeryFast = 10
+        Medium = 7,
+        Fast = 15,
+        VeryFast = 20
     }
 }

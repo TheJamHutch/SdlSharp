@@ -30,7 +30,7 @@ namespace SdlSharpened.App
 
         public BitmapText()
         {
-            _sheetTexture = new Texture(Config.SpritesheetNumsheet, ColourType.Magenta);
+            _sheetTexture = new Texture("D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\img\\numsheet.bmp", ColourType.Magenta);
             //_dstTexture = new Texture(640, 480);
             _srcRect = new Rect(0, 0, 32, 32);
             _dstRect = new Rect(0, 0, 32, 32);

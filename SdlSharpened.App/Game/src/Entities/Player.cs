@@ -1,4 +1,7 @@
-﻿using System;
+﻿/* 
+** 
+*/
+using System;
 using System.Collections.Generic;
 using SdlSharpened;
 
@@ -6,46 +9,49 @@ namespace SdlSharpened.App
 {
     public class Player : IMoveable, IRenderable
     {
+        private Point _centerView;
+        private Rect _worldRect;
+        private Rect _viewRect;
+        private MoveDirection _moveDirection = MoveDirection.None;
+        private MoveSpeed _moveSpeed = MoveSpeed.Medium;
+        private ITilemap _tilemap;
+        private Camera _camera;
+
+        private Texture _texture;
+        private Rect _srcRect;
+
+        public Player(ITilemap tilemap, Camera camera, Rect spriteRect)
+        {
+            _tilemap = tilemap;
+            _camera = camera;
+
+            int centerX = camera.WorldRect.X + (camera.WorldRect.W / 2 - spriteRect.W / 2);
+            int centerY = camera.WorldRect.Y + (camera.WorldRect.H / 2 - spriteRect.H / 2);
+
+            _centerView = new Point(centerX, centerY);
+
+            // Use spriteRect.X/Y to position player. 
+            var initPos = new Point(200, 200);
+
+            _texture = new Texture("D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\img\\player.bmp", ColourType.Magenta);
+            _srcRect = new Rect(0, 0, spriteRect.W, spriteRect.H);
+
+            _worldRect = new Rect(initPos.X, initPos.Y, spriteRect.W, spriteRect.H);
+            _viewRect = new Rect(initPos.X, initPos.Y, spriteRect.W, spriteRect.H);
+        }
+
         public Rect WorldRect { get { return _worldRect; } }
         public Rect ViewRect { get { return _viewRect; } }
         public MoveDirection Direction { get { return _moveDirection; } set { _moveDirection = value; } }
         public MoveSpeed Speed { get { return _moveSpeed; } set { _moveSpeed = value; } }
 
-        private Rect _worldRect;
-        private Rect _viewRect;
-        private MoveDirection _moveDirection = MoveDirection.None;
-        private MoveSpeed _moveSpeed = MoveSpeed.Slow;
-        private SpriteSheet _spriteSheet;
-        private ITilemap _tilemap;
-        private Camera _camera;
-
-        private Point _centerView;
-
-        public Player(ITilemap tilemap, Camera camera)
-        {
-            // Get player sprite pixel size from config
-            int pixelSize = Config.PlayerSpriteSize;
-            // Calculate the point where the center of the player is in center view
-            int centerX = camera.WorldRect.X + (camera.WorldRect.W / 2 - pixelSize / 2);
-            int centerY = camera.WorldRect.Y + (camera.WorldRect.H / 2 - pixelSize / 2);
-
-            _centerView = new Point(centerX, centerY);
-
-            _spriteSheet = new SpriteSheet(Config.SpritesheetPlayer, new Point(pixelSize, pixelSize), Config.TransparentColour);
-            _worldRect = new Rect(_centerView.X, _centerView.Y, pixelSize, pixelSize);
-            _viewRect = new Rect(_centerView.X, _centerView.Y, pixelSize, pixelSize);
-            _tilemap = tilemap;
-            _camera = camera;
-        }
-
         public void Render()
         {
-            Game.RendererInstance.Copy(_spriteSheet.SheetTexture, _spriteSheet.SheetFrame, _viewRect);
+            Game.RendererInstance.Copy(_texture, _srcRect, _viewRect);
         }
 
         public void Update()
         {
-
             bool collide = Collision();
             Animate();
             Move(collide);
@@ -76,19 +82,19 @@ namespace SdlSharpened.App
                     break;
             }
 
-            int[,] localTiles = _tilemap.LocalTiles(new Point(_worldRect.X + padX, _worldRect.Y + padY));
+            //int[,] localTiles = _tilemap.LocalTiles(new Point(_worldRect.X + padX, _worldRect.Y + padY));
 
             return ( 
                     // Check player edge of tilemap collision
                     (playerY < 1) && (_moveDirection == MoveDirection.North) ||
                     ((playerX < 1) && (_moveDirection == MoveDirection.West)) ||
-                    ((playerY >= _tilemap.Resolution.Y - 64) && (_moveDirection == MoveDirection.South)) ||
-                    ((playerX > _tilemap.Resolution.X - 64) && (_moveDirection == MoveDirection.East)) ||
+                    (((playerY + 32) >= _tilemap.WorldRect.H - 32) && (_moveDirection == MoveDirection.South)) ||
+                    (((playerX + 32) >= _tilemap.WorldRect.W - 32) && (_moveDirection == MoveDirection.East))
 
                     // Check player tilemap collision
-                    (localTiles[1, 0] > EMPTY_TILE && _moveDirection == MoveDirection.North) ||
+                    //(localTiles[1, 0] > EMPTY_TILE && _moveDirection == MoveDirection.North) ||
                     /*(localTiles[2, 1] > EMPTY_TILE && _moveDirection == MoveDirection.East) ||*/
-                    (localTiles[1, 2] > EMPTY_TILE && _moveDirection == MoveDirection.South)// ||
+                    //(localTiles[1, 2] > EMPTY_TILE && _moveDirection == MoveDirection.South)// ||
                     //(localTiles[0, 1] > EMPTY_TILE && _moveDirection == MoveDirection.West)
 
                     ) ? true : false;
@@ -96,6 +102,7 @@ namespace SdlSharpened.App
 
         private void Animate() 
         {
+        /*
             switch (_moveDirection)
             {
                 case MoveDirection.South:
@@ -118,6 +125,7 @@ namespace SdlSharpened.App
             {
                 _spriteSheet._srcRect.X = 32 * (int)((Timing.Ticks() / 60) % 5);
             }
+            */
         }
 
         private void Move(bool collide) 

@@ -44,5 +44,10 @@ namespace SdlSharpened
         {
             return $"X: {_sdlPoint.x}, Y: {_sdlPoint.y}";
         }
+
+        public static Point Distance(Point src, Point dst)
+        {
+            return new Point(dst.X - src.X, dst.Y - src.Y);
+        }
     }
 }
