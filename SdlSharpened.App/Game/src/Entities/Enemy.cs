@@ -26,7 +26,8 @@ namespace SdlSharpened.App
         {
             _arrived = false;
             _camera = camera;
-            _tilemap = tilemap; _worldRect = new Rect(10, 10, 32, 32);
+            _tilemap = tilemap; 
+            _worldRect = new Rect(10, 10, 32, 32);
             _viewRect = new Rect(10, 10, 32, 32);
             _texture = new Texture("D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\img\\slime.bmp", ColourType.Magenta);
             _srcRect = new Rect(0, 0, 32, 32);

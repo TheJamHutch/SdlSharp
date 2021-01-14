@@ -136,6 +136,7 @@ namespace SdlSharpened.App
             // Extract dimension and tile string from mapStream string.
             int firstSemiIdx = mapStream.IndexOf(';');
             string dimStream = mapStream.Substring(0, firstSemiIdx);
+            // TODO: Don't rely on adding literals to get the right results
             string tileStream = mapStream.Substring(firstSemiIdx + 1, mapStream.Length - firstSemiIdx - 2);
 
             // Convert

@@ -4,6 +4,8 @@ using SdlSharpened;
 
 namespace SdlSharpened.App
 {
+    public delegate void NewFrameEventHandler(object sender, EventArgs ea);
+
     public class Game
     {
         // Renderer singleton
@@ -24,6 +26,9 @@ namespace SdlSharpened.App
         private Player _player;
         private Enemy _enemy;
         private Tilemap _tilemap;
+
+        
+        public NewFrameEventHandler NewFrame;
 
         public Game(GameConfig gameConfig)
         {
@@ -109,7 +114,8 @@ namespace SdlSharpened.App
                     timeDiff = 1;
                 }
 
-                Timing.Delay((uint)(33 - timeDiff)); 
+                Timing.Delay((uint)(33 - timeDiff));
+                //NewFrame?.Invoke(this, EventArgs.Empty);
             }
         }
     }

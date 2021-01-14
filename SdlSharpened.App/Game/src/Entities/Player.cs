@@ -1,5 +1,6 @@
 ﻿/* 
-** 
+**
+**
 */
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,9 @@ namespace SdlSharpened.App
         private Texture _texture;
         private Rect _srcRect;
 
+        // TODO: rename
+        event NewFrameEventHandler _newFrameEventHandler;
+
         public Player(ITilemap tilemap, Camera camera, Rect spriteRect)
         {
             _tilemap = tilemap;
@@ -38,6 +42,9 @@ namespace SdlSharpened.App
 
             _worldRect = new Rect(initPos.X, initPos.Y, spriteRect.W, spriteRect.H);
             _viewRect = new Rect(initPos.X, initPos.Y, spriteRect.W, spriteRect.H);
+
+            // Subscribe to game for new frame updates
+            //_newFrameEventHandler += Foo;
         }
 
         public Rect WorldRect { get { return _worldRect; } }
@@ -102,30 +109,33 @@ namespace SdlSharpened.App
 
         private void Animate() 
         {
-        /*
-            switch (_moveDirection)
-            {
-                case MoveDirection.South:
-                    _spriteSheet.SetFrame(0, 0);
-                    break;
-                case MoveDirection.East:
-                    _spriteSheet.SetFrame(0, 1);
-                    break;
-                case MoveDirection.North:
-                    _spriteSheet.SetFrame(0, 2);
-                    break;
-                case MoveDirection.West:
-                    _spriteSheet.SetFrame(0, 3);
-                    break;
-                case MoveDirection.None:
-                    break;
-            }
+            //_srcRect.X = 32 * (int)((Timing.Ticks() / 60) % 5);
+            NextFrame();
 
-            if (_moveDirection != MoveDirection.None)
-            {
-                _spriteSheet._srcRect.X = 32 * (int)((Timing.Ticks() / 60) % 5);
-            }
-            */
+            /*
+                switch (_moveDirection)
+                {
+                    case MoveDirection.South:
+                        _spriteSheet.SetFrame(0, 0);
+                        break;
+                    case MoveDirection.East:
+                        _spriteSheet.SetFrame(0, 1);
+                        break;
+                    case MoveDirection.North:
+                        _spriteSheet.SetFrame(0, 2);
+                        break;
+                    case MoveDirection.West:
+                        _spriteSheet.SetFrame(0, 3);
+                        break;
+                    case MoveDirection.None:
+                        break;
+                }
+
+                if (_moveDirection != MoveDirection.None)
+                {
+                    _spriteSheet._srcRect.X = 32 * (int)((Timing.Ticks() / 60) % 5);
+                }
+                */
         }
 
         private void Move(bool collide) 
@@ -187,6 +197,29 @@ namespace SdlSharpened.App
 
             _worldRect.X += xVel * (int)_moveSpeed;
             _worldRect.Y += yVel * (int)_moveSpeed;
+        }
+
+        // Advances the srcRect along one position in the spritesheet texture, wraps around.
+        private void NextFrame() 
+        {
+            _srcRect.X += 32;
+            if (_srcRect.X + 32 >= _texture.Width)
+            {
+                _srcRect.X = 0;
+                _srcRect.Y += 32;
+
+                if (_srcRect.Y + 32 >= _texture.Height)
+                {
+                    _srcRect.Y = 0;
+                    _srcRect.X = 0;
+                }
+            }
+        }
+
+        private void SetFrame(int x, int y) 
+        {
+            _srcRect.X = x * 32;
+            _srcRect.Y = y * 32;
         }
     }
 }
