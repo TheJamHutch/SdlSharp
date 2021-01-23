@@ -13,9 +13,9 @@ namespace SdlSharpened.App
 
         public Camera(ITilemap tilemap, Rect posRect)
         {
+            _tilemap = tilemap;
             _worldRect = new Rect(posRect);
             _viewRect = new Rect(0, 0, posRect.W, posRect.H);
-            _tilemap = tilemap;
         }
 
         public Rect WorldRect { get { return _worldRect; } }
@@ -42,28 +42,35 @@ namespace SdlSharpened.App
             }
 
             Collision(ref xVel, ref yVel);
+
+            Console.WriteLine($"N: {LockN}, E: {LockE}, S: {LockS}, W: {LockW}");
+
             Move(xVel, yVel);
         }
 
         private void Collision(ref int xVel, ref int yVel) 
         {
             // Stop camera going off edge of tilemap.
+            // North edge
             if ((_worldRect.Y <= _tilemap.WorldRect.Y) && (_moveDirection == MoveDirection.North))
             {
                 LockN = true;
                 yVel = 0;
             }
+            // South edge
             else if ((_worldRect.Y + _worldRect.H >= (_tilemap.WorldRect.H - (int)_tilemap.TilePixelSize)) && (_moveDirection == MoveDirection.South))
             {
                 LockS = true;
                 yVel = 0;
             }
 
+            // West edge
             if (((_worldRect.X <= _tilemap.WorldRect.X) && (_moveDirection == MoveDirection.West)))
             {
                LockW = true;
                 xVel = 0;
             }
+            // East edge
             else if ((_worldRect.X + _worldRect.W >= (_tilemap.WorldRect.W - (int)_tilemap.TilePixelSize)) && (_moveDirection == MoveDirection.East))
             {
                 LockE = true;

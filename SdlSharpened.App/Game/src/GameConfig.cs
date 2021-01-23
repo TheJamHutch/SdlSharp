@@ -10,17 +10,26 @@ namespace SdlSharpened.App
     {
         // Window config
         public string WindowTitle { get; } = "Tile Game";
-        public int WindowResX { get; } = 800;
-        public int WindowResY { get; } = 600;
+
+        // Tested @ 640x480, 800x600, 960x540
+        public int WindowResX { get; } = 640;
+        public int WindowResY { get; } = 480;
 
         public int TargetFps { get; } = 30;
 
         // Tilemap config
         public TileSize TilePixels { get; } = TileSize.Medium;
-        public int TilesX { get; } = 40;
-        public int TilesY { get; } = 60;
+        public int TilesX { get; } = 500;
+        public int TilesY { get; } = 400;
+
+        public string TilesheetPath { get; } = "..\\..\\..\\Game\\img\\basetiles.bmp";
 
         private readonly string _iniPath = "..\\..\\..\\Game\\config.ini";
+
+
+
+
+
 
         private Dictionary<string, string> _configDictionary;
 

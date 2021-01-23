@@ -77,11 +77,11 @@ namespace SdlSharpened.App
             }
         }
 
-        public void Render()
+        public void Render(Renderer renderer)
         {
             _viewRect.X = _worldRect.X - _camera.WorldRect.X;
             _viewRect.Y = _worldRect.Y - _camera.WorldRect.Y;
-            Game.RendererInstance.Copy(_texture, _srcRect, _viewRect);
+            renderer.Copy(_texture, _srcRect, _viewRect);
         }
 
         public void Animate()

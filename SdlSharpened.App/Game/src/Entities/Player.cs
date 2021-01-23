@@ -8,21 +8,45 @@ using SdlSharpened;
 
 namespace SdlSharpened.App
 {
+    public class Animation 
+    {
+        public Point StartPos { get; }
+        public int CellCount { get; }
+        public int WaitFrames { get; }
+
+        public Animation(Point startPos, int cellCount, int waitFrames)
+        {
+            StartPos = startPos;
+            CellCount = cellCount;
+            WaitFrames = waitFrames;
+        }
+    }
+
     public class Player : IMoveable, IRenderable
     {
+        private MoveDirection _moveDirection = MoveDirection.None;
+        private MoveSpeed _moveSpeed = MoveSpeed.Medium;
         private Point _centerView;
         private Rect _worldRect;
         private Rect _viewRect;
-        private MoveDirection _moveDirection = MoveDirection.None;
-        private MoveSpeed _moveSpeed = MoveSpeed.Medium;
+        private Rect _clipRect;
         private ITilemap _tilemap;
         private Camera _camera;
-
         private Texture _texture;
-        private Rect _srcRect;
+
+        private Animation _currentAnimation;
+
+        private Dictionary<string, Animation> _animationDictionary = new Dictionary<string, Animation>()
+        {
+            { "default", new Animation(new Point(0, 0), 1, 3) },
+            { "WalkSouth", new Animation(new Point(0, 0), 5, 3) },
+            { "WalkEast", new Animation(new Point(0, 1), 5, 3) },
+            { "WalkNorth", new Animation(new Point(0, 2), 5, 3) },
+            { "WalkWest", new Animation(new Point(0, 3), 5, 3) }
+        };
 
         // TODO: rename
-        event NewFrameEventHandler _newFrameEventHandler;
+       // event NewFrameEventHandler _newFrameEventHandler;
 
         public Player(ITilemap tilemap, Camera camera, Rect spriteRect)
         {
@@ -38,13 +62,14 @@ namespace SdlSharpened.App
             var initPos = new Point(200, 200);
 
             _texture = new Texture("D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\img\\player.bmp", ColourType.Magenta);
-            _srcRect = new Rect(0, 0, spriteRect.W, spriteRect.H);
-
+            
             _worldRect = new Rect(initPos.X, initPos.Y, spriteRect.W, spriteRect.H);
             _viewRect = new Rect(initPos.X, initPos.Y, spriteRect.W, spriteRect.H);
-
+            _clipRect = new Rect(0, 0, spriteRect.W, spriteRect.H);
             // Subscribe to game for new frame updates
             //_newFrameEventHandler += Foo;
+
+            _currentAnimation = _animationDictionary["default"];
         }
 
         public Rect WorldRect { get { return _worldRect; } }
@@ -52,13 +77,29 @@ namespace SdlSharpened.App
         public MoveDirection Direction { get { return _moveDirection; } set { _moveDirection = value; } }
         public MoveSpeed Speed { get { return _moveSpeed; } set { _moveSpeed = value; } }
 
-        public void Render()
+        public void Render(Renderer renderer)
         {
-            Game.RendererInstance.Copy(_texture, _srcRect, _viewRect);
+            renderer.Copy(_texture, _clipRect, _viewRect);
         }
 
         public void Update()
         {
+            switch (_moveDirection) 
+            {
+                case MoveDirection.North:
+                    _currentAnimation = _animationDictionary["WalkNorth"];
+                    break;
+                case MoveDirection.East:
+                    _currentAnimation = _animationDictionary["WalkEast"];
+                    break;
+                case MoveDirection.South:
+                    _currentAnimation = _animationDictionary["WalkSouth"];
+                    break;
+                default:
+                    _currentAnimation = _animationDictionary["default"];
+                    break;
+            }
+
             bool collide = Collision();
             Animate();
             Move(collide);
@@ -89,7 +130,7 @@ namespace SdlSharpened.App
                     break;
             }
 
-            //int[,] localTiles = _tilemap.LocalTiles(new Point(_worldRect.X + padX, _worldRect.Y + padY));
+            //TileEffect[,] localTiles = _tilemap.LocalTiles(new Point(_worldRect.X + padX, _worldRect.Y + padY));
 
             return ( 
                     // Check player edge of tilemap collision
@@ -99,43 +140,45 @@ namespace SdlSharpened.App
                     (((playerX + 32) >= _tilemap.WorldRect.W - 32) && (_moveDirection == MoveDirection.East))
 
                     // Check player tilemap collision
-                    //(localTiles[1, 0] > EMPTY_TILE && _moveDirection == MoveDirection.North) ||
-                    /*(localTiles[2, 1] > EMPTY_TILE && _moveDirection == MoveDirection.East) ||*/
-                    //(localTiles[1, 2] > EMPTY_TILE && _moveDirection == MoveDirection.South)// ||
-                    //(localTiles[0, 1] > EMPTY_TILE && _moveDirection == MoveDirection.West)
+                    //(localTiles[1, 0] == TileEffect.Solid && _moveDirection == MoveDirection.North) ||
+                    //(localTiles[2, 1] == TileEffect.Solid && _moveDirection == MoveDirection.East) /*||
+                    //(localTiles[1, 2] == TileEffect.Solid && _moveDirection == MoveDirection.South) ||
+                    //(localTiles[0, 1] == TileEffect.Solid && _moveDirection == MoveDirection.West)*/
 
                     ) ? true : false;
         }
 
+        private int _frameCounter = 0;
+        private int _cellCounter = 0;
+
         private void Animate() 
         {
-            //_srcRect.X = 32 * (int)((Timing.Ticks() / 60) % 5);
-            NextFrame();
+            if (Game.NewFrame)
+            {
+                _frameCounter++;
+            }
 
-            /*
-                switch (_moveDirection)
-                {
-                    case MoveDirection.South:
-                        _spriteSheet.SetFrame(0, 0);
-                        break;
-                    case MoveDirection.East:
-                        _spriteSheet.SetFrame(0, 1);
-                        break;
-                    case MoveDirection.North:
-                        _spriteSheet.SetFrame(0, 2);
-                        break;
-                    case MoveDirection.West:
-                        _spriteSheet.SetFrame(0, 3);
-                        break;
-                    case MoveDirection.None:
-                        break;
-                }
+            // On animation start/ restart
+            if (_cellCounter == 0)
+            {
+                SetFrame(_currentAnimation.StartPos);
+                _cellCounter++;
+            }
 
-                if (_moveDirection != MoveDirection.None)
-                {
-                    _spriteSheet._srcRect.X = 32 * (int)((Timing.Ticks() / 60) % 5);
-                }
-                */
+            if (_cellCounter == _currentAnimation.CellCount)
+            {
+                _cellCounter = 0;
+                return;
+            }
+
+            if (_frameCounter == _currentAnimation.WaitFrames)
+            {
+                NextFrame();
+                _frameCounter = 0;
+                _cellCounter++;
+
+                
+            }
         }
 
         private void Move(bool collide) 
@@ -202,24 +245,24 @@ namespace SdlSharpened.App
         // Advances the srcRect along one position in the spritesheet texture, wraps around.
         private void NextFrame() 
         {
-            _srcRect.X += 32;
-            if (_srcRect.X + 32 >= _texture.Width)
+            _clipRect.X += 32;
+            if (_clipRect.X + 32 >= _texture.Width)
             {
-                _srcRect.X = 0;
-                _srcRect.Y += 32;
+                _clipRect.X = 0;
+                _clipRect.Y += 32;
 
-                if (_srcRect.Y + 32 >= _texture.Height)
+                if (_clipRect.Y + 32 >= _texture.Height)
                 {
-                    _srcRect.Y = 0;
-                    _srcRect.X = 0;
+                    _clipRect.Y = 0;
+                    _clipRect.X = 0;
                 }
             }
         }
 
-        private void SetFrame(int x, int y) 
+        private void SetFrame(Point framePos) 
         {
-            _srcRect.X = x * 32;
-            _srcRect.Y = y * 32;
+            _clipRect.X = framePos.X * 32;
+            _clipRect.Y = framePos.Y * 32;
         }
     }
 }

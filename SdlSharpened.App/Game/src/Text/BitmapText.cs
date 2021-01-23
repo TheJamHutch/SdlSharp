@@ -6,67 +6,66 @@ using SDL2;
 
 namespace SdlSharpened.App
 {
+    
+
     public class BitmapText
     {
         private Texture _sheetTexture;
-       // private Texture _dstTexture;
-        private Rect _srcRect;
-        private Rect _dstRect;
-        private string _value = "721457432";
-
-        private static readonly Dictionary<char, Point> _charFrameMap = new Dictionary<char, Point>()
-        {
-            { '0', new Point(0, 0)},
-            { '1', new Point(1, 0)},
-            { '2', new Point(2, 0)},
-            { '3', new Point(3, 0)},
-            { '4', new Point(0, 1)},
-            { '5', new Point(1, 1)},
-            { '6', new Point(2, 1)},
-            { '7', new Point(3, 1)},
-            { '8', new Point(0, 2)},
-            { '9', new Point(1, 2)}
-        };
+        private Rect _clipRect;
+        private Rect _viewRect;
+        //Text box
+        private string _textContent = "rustuv";
+        private const int ASCII_OFFSET = 32;
 
         public BitmapText()
         {
-            _sheetTexture = new Texture("D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\img\\numsheet.bmp", ColourType.Magenta);
-            //_dstTexture = new Texture(640, 480);
-            _srcRect = new Rect(0, 0, 32, 32);
-            _dstRect = new Rect(0, 0, 32, 32);
+            _sheetTexture = new Texture("D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\img\\charsheet2.bmp", ColourType.Magenta);
+            _clipRect = new Rect(0, 0, 24, 24);
+            _viewRect = new Rect(20, 300, 600, 160);
         }
 
-        public void Render()
+        public void Render(Renderer renderer)
         {
-            _dstRect.X = 0;
-            var textChars = _value.ToCharArray();
+            renderer.FillRect(_viewRect, ColourType.Blue);
+            renderer.DrawRect(_viewRect, ColourType.White);
+
+            Rect dstRect = new Rect(_viewRect.X + 10, _viewRect.Y + 10, _clipRect.W, _clipRect.H);
+
+            var textChars = _textContent.ToCharArray();
             foreach (char ch in textChars)
             {
-                _srcRect = SetSrcRect(ch);
-                _srcRect = SetSrcRect(ch);
-                Game.RendererInstance.Copy(_sheetTexture, _srcRect, _dstRect);
-                _dstRect.X += 32;
+                SetClipRect(ch);
+                renderer.Copy(_sheetTexture, _clipRect, dstRect);
+                dstRect.X += 24;
+                if (dstRect.X > _viewRect.W)
+                {
+                    dstRect.X = 24;
+                    dstRect.Y += 30;
+                }
             }
         }
 
-        public void SetValue(int val) 
+        private void SetClipRect(char ch) 
         {
-            _value = val.ToString();
-        }
+            int pos = (int)ch - ASCII_OFFSET;
+            int x = 0;
+            int y = 0;
 
-        private void Update() 
-        {
+            for (int i = 0; i < pos; i++)
+            {
+                x += 1;
+                if (x > 9)
+                {
+                    x = 0;
+                    y += 1;
+                }
+            }
 
-        }
+            _clipRect.X = x * 23;
+            _clipRect.Y = y * 23;
 
-        private Rect SetSrcRect(char val) 
-        {
-            Point point = _charFrameMap[val];
 
-            point.X *= 32;
-            point.Y *= 32;
-
-            return new Rect(point.X, point.Y, 32, 32);
+            Console.WriteLine($"{x}, {y}");
         }
     }
 }

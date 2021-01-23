@@ -28,6 +28,8 @@
 */
 using System;
 using System.IO;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace SdlSharpened.App
 {
@@ -37,7 +39,7 @@ namespace SdlSharpened.App
         private const int EMPTY_TILE = -1;
 
         // 2D array holds the value of each tile.
-        private Tile[,] _tileGrid;
+        private int[,] _tileGrid;
 
         // How many tiles in map X and Y ways.
         private int _tilesX;
@@ -60,6 +62,9 @@ namespace SdlSharpened.App
         // A Rect that encompasses the entire tilemap, represents its position in the game world.
         // X and Y are where the map starts ( it may be offset), and W and H are the resolution of the tilemap.
         private Rect _worldRect;
+
+        //
+        private Dictionary<int, TileEffect> _tileEffectMap;
 
         public Tilemap(string sheetPath, int tilesX, int tilesY, TileSize tileSize, Rect viewRect)
         {
@@ -87,14 +92,21 @@ namespace SdlSharpened.App
             _worldRect = new Rect(0, 0, resX, resY);
 
             // Initialise grid of tiles and set all to EMPTY.
-            _tileGrid = new Tile[_tilesX, _tilesY];
+            _tileGrid = new int[_tilesX, _tilesY];
             for (int y = 0; y < tilesY; y++)
             {
                 for (int x = 0; x < tilesX; x++)
                 {
-                    _tileGrid[x, y] = new Tile(0, TileEffect.None);
+                    _tileGrid[x, y] = 0;
                 }
             }
+
+
+            _tileEffectMap = new Dictionary<int, TileEffect>()
+            { 
+                { 1, TileEffect.Solid },
+                { 5, TileEffect.Damage }
+            };
         }
 
         // Getter properties.
@@ -113,7 +125,7 @@ namespace SdlSharpened.App
             {
                 for (int x = 0; x < _tilesX; x++)
                 {
-                    tileStream += $"{_tileGrid[x, y].Type},";
+                    tileStream += $"{_tileGrid[x, y]},";
                 }
             }
             // Remove last comma and add semicolon
@@ -145,18 +157,22 @@ namespace SdlSharpened.App
 
             _tilesX = xDim;
             _tilesY = yDim;
-            _tileGrid = new Tile[_tilesX, _tilesY];
+            _tileGrid = new int[_tilesX, _tilesY];
 
+            int[] tileVals = tileStream.Split(',').Select((n) => Convert.ToInt32(n)).ToArray();
+
+            int c = 0;
             for (int y = 0; y < _tilesY; y++)
             {
                 for (int x = 0; x < _tilesX; x++)
                 {
-                    _tileGrid[x, y] = new Tile(2, TileEffect.None);
+                    _tileGrid[x, y] = tileVals[c];
+                    c += 1;
                 }
             }
         }
 
-        public void Render(Rect viewRect)
+        public void Render(Renderer renderer, Rect viewRect)
         {
             Rect srcRect = new Rect(0, 0, (int)_tileSize, (int)_tileSize);
             Rect dstRect = new Rect(0, 0, (int)_tileSize, (int)_tileSize);
@@ -176,38 +192,39 @@ namespace SdlSharpened.App
             {
                 for (int x = startX; x < endX; x++)
                 {
-                    srcRect = SetSrcRect(_tileGrid[x, y].Type, (int)_tileSize);
+                    srcRect = SetSrcRect(_tileGrid[x, y], (int)_tileSize);
 
                     dstRect.X = _offsetX + (x * (int)_tileSize - viewRect.X);
                     dstRect.Y = _offsetY + (y * (int)_tileSize - viewRect.Y);
 
                     // Do not render empty tile.
-                    if (_tileGrid[x, y].Type > EMPTY_TILE)
+                    if (_tileGrid[x, y] > EMPTY_TILE)
                     {
-                        Game.RendererInstance.Copy(_texture, srcRect, dstRect);
+                        renderer.Copy(_texture, srcRect, dstRect);
                     }
                 }
             }
         }
 
-        public int[,] LocalTiles(Point pos)
+        public TileEffect[,] LocalTiles(Point pos)
         {
             Point tile = TileFromPos(pos, (int)_tileSize);
 
             int startX = (tile.X > 0) ? tile.X - 1 : 0;
             int startY = (tile.Y > 0) ? tile.Y - 1 : 0;
-            int endX = (tile.X < _worldRect.X - 1) ? tile.X + 1 : tile.X;
-            int endY = (tile.Y < _worldRect.Y - 1) ? tile.Y + 1 : tile.Y;
+            int endX = (tile.X < _tilesX) ? tile.X + 1 : tile.X;
+            int endY = (tile.Y < _tilesY) ? tile.Y + 1 : tile.Y;
 
-            int[,] localTiles = new int[3, 3];
+            TileEffect[,] localTiles = new TileEffect[3, 3];
             int lx = 0;
             int ly = 0;
             for (int y = startY; y <= endY; y++)
             {
                 for (int x = startX; x <= endX; x++)
                 {
-                    localTiles[lx, ly] = _tileGrid[x, y].Type;
+                    localTiles[lx, ly] = GetTileEffect(_tileGrid[x, y]);
                     lx += 1;
+
                 }
                 ly += 1;
                 lx = 0;
@@ -270,7 +287,7 @@ namespace SdlSharpened.App
             {
                 for (int x = 0; x < _tilesX; x++)
                 {
-                    if (_tileGrid[x, y].Type == 0)
+                    if (_tileGrid[x, y] == 0)
                     {
                         posPoint = PosFromTile(new Point(x, y));
 
@@ -288,7 +305,15 @@ namespace SdlSharpened.App
         //
         public int GetTileType(Point tile)
         {
-            return _tileGrid[tile.X, tile.Y].Type;
+            return _tileGrid[tile.X, tile.Y];
         }
+
+        //
+        private TileEffect GetTileEffect(int tileType) 
+        {
+            _tileEffectMap.TryGetValue(tileType, out var tileEffect);
+
+            return tileEffect;
+        } 
     }
 }

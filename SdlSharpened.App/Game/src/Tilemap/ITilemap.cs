@@ -15,7 +15,7 @@ namespace SdlSharpened.App
 
         void Load();
 
-        int[ , ] LocalTiles(Point tilePos);
+        TileEffect[ , ] LocalTiles(Point tilePos);
 
         Point PosFromTile(Point tile);
 
