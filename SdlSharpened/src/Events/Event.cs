@@ -10,12 +10,29 @@ namespace SdlSharpened
     /// </summary>
     public class Event
     {
-        public EventType Type { get { return (EventType)_sdlEvent.type; } }
-
-        public Keycode Keycode { get { return KeycodeEx.FromSdl(_sdlEvent.key.keysym.sym); } }
+        // Mouse event structures
+        private MouseMotionEvent _motion;
+        private MouseButtonEvent _button;
+        private MouseWheelEvent _wheel;
 
         // The internal SDL_Event structure.
-        private SDL.SDL_Event _sdlEvent = new SDL.SDL_Event();
+        private static SDL.SDL_Event _sdlEvent = new SDL.SDL_Event();
+
+        public Event()
+        {
+            _motion = new MouseMotionEvent();  
+            _button = new MouseButtonEvent();
+            _wheel = new MouseWheelEvent();
+        }
+
+        public EventType Type { get { return (EventType)_sdlEvent.type; } }
+        public Keycode Keycode { get { return KeycodeEx.FromSdl(_sdlEvent.key.keysym.sym); } }
+
+        public MouseButtonEvent Button { get { return _button; } }
+        public MouseMotionEvent Motion { get { return _motion; } }
+
+        internal static SDL.SDL_Event SdlEvent { get { return _sdlEvent; } }
+
 
         public int Poll()
         {

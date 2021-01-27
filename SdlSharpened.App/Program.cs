@@ -6,10 +6,7 @@ namespace SdlSharpened.App
     {
         static void Main(string[] args)
         {
-            var gameConfig = new GameConfig();
-            //gameConfig.Load();
-
-            var game = new Game(gameConfig);
+            var game = new Game();
 
             // Blocking
             game.Start();

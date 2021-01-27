@@ -7,79 +7,88 @@ namespace SdlSharpened.App
     {
         private Rect _worldRect;
         private Rect _viewRect;
-        private MoveSpeed _moveSpeed = MoveSpeed.Medium;
+
+        private Point _viewSize;
+
+        private MoveSpeed _moveSpeed;
         private MoveDirection _moveDirection = MoveDirection.None;
+
         private ITilemap _tilemap;
 
-        public Camera(ITilemap tilemap, Rect posRect)
+        private Logger _logger;
+
+        public Camera(EntitiesConfig config, ITilemap tilemap, Point viewSize, Logger logger)
         {
             _tilemap = tilemap;
-            _worldRect = new Rect(posRect);
-            _viewRect = new Rect(0, 0, posRect.W, posRect.H);
+            _logger = logger;
+
+            // Set camera's init movement speed. Read from config.
+            _moveSpeed = config.CameraMoveSpeed;
+            _viewSize = viewSize;
+
+            Init();
+            Game.ReloadEvent += () => Init();
         }
 
         public Rect WorldRect { get { return _worldRect; } }
         public Rect ViewRect { get { return _viewRect; } }
+
         public MoveDirection Direction { get { return _moveDirection; } set { _moveDirection = value; } }
         public MoveSpeed Speed { get { return _moveSpeed; } set { _moveSpeed = value; } }
 
-        public bool LockN { get; set; } = true;
+        public bool LockN { get; set; } = false;
         public bool LockE { get; set; } = false;
         public bool LockS { get; set; } = false;
-        public bool LockW { get; set; } = true;
+        public bool LockW { get; set; } = false;
+
+        public void Init() 
+        {
+            int mapX = (_tilemap.ScrollsX) ? _tilemap.WorldRect.X : 0;
+            int mapY = (_tilemap.ScrollsY) ? _tilemap.WorldRect.Y : 0;
+
+            _worldRect = new Rect(mapX, mapY, _viewSize.X, _viewSize.Y);
+            _viewRect = new Rect(0, 0, _viewSize.X, _viewSize.Y);
+
+            InitLocks();
+
+            if (AllLocked())
+            {
+                _logger.Info("Camera locked in all directions.");
+            }
+        }
 
         public void Update()
         {
-            _moveDirection.SetVelocities(out var xVel, out var yVel);
-
-            if (!_tilemap.ScrollsX)
-            {
-                xVel = 0;
-            }
-            if (!_tilemap.ScrollsY)
-            {
-                yVel = 0;
-            }
-
-            Collision(ref xVel, ref yVel);
-
-            Console.WriteLine($"N: {LockN}, E: {LockE}, S: {LockS}, W: {LockW}");
-
-            Move(xVel, yVel);
+            Collision();
+            Move();
         }
 
-        private void Collision(ref int xVel, ref int yVel) 
+        private void Collision() 
         {
             // Stop camera going off edge of tilemap.
-            // North edge
             if ((_worldRect.Y <= _tilemap.WorldRect.Y) && (_moveDirection == MoveDirection.North))
             {
                 LockN = true;
-                yVel = 0;
             }
-            // South edge
             else if ((_worldRect.Y + _worldRect.H >= (_tilemap.WorldRect.H - (int)_tilemap.TilePixelSize)) && (_moveDirection == MoveDirection.South))
             {
                 LockS = true;
-                yVel = 0;
             }
 
-            // West edge
             if (((_worldRect.X <= _tilemap.WorldRect.X) && (_moveDirection == MoveDirection.West)))
             {
                LockW = true;
-                xVel = 0;
             }
-            // East edge
             else if ((_worldRect.X + _worldRect.W >= (_tilemap.WorldRect.W - (int)_tilemap.TilePixelSize)) && (_moveDirection == MoveDirection.East))
             {
                 LockE = true;
-                xVel = 0;
             }
         }
 
-        void Move(int xVel, int yVel)
+        private void Move()
         {
+            _moveDirection.SetVelocities(out var xVel, out var yVel);
+
             if (!LockW && !LockE)
             {
                 _worldRect.X += xVel * (int)_moveSpeed;
@@ -88,6 +97,22 @@ namespace SdlSharpened.App
             {
                 _worldRect.Y += yVel * (int)_moveSpeed;
             }
+        }
+
+        // Init the directional camera locks. Camera is locked in a particular direction if camera
+        // position is already beyond bounds of tilemap. Camera is also locked both ways across a particular
+        // axis if the tilemap cannot scroll that way.
+        private void InitLocks() 
+        {
+            LockN = (!_tilemap.ScrollsY) || (_worldRect.Y <= _tilemap.WorldRect.Y) ? true : false;
+            LockW = (!_tilemap.ScrollsX) || (_worldRect.X <= _tilemap.WorldRect.Y) ? true : false;
+            LockE = (!_tilemap.ScrollsX) || (_worldRect.X + _worldRect.W <= _tilemap.WorldRect.Y) ? true : false;
+            LockS = (!_tilemap.ScrollsY) || (_worldRect.Y + _worldRect.H <= _tilemap.WorldRect.Y) ? true : false;
+        }
+
+        private bool AllLocked() 
+        {
+            return (LockN && LockE && LockS && LockW);
         }
     }
 }

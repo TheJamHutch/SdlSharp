@@ -38,6 +38,8 @@ namespace SdlSharpened.App
         // Numerical constant for empty tiles in tilemap. All tiles are empty in initial map. Empty tiles are not rendered.
         private const int EMPTY_TILE = -1;
 
+        private string _mapFolderPath;
+
         // 2D array holds the value of each tile.
         private int[,] _tileGrid;
 
@@ -66,41 +68,51 @@ namespace SdlSharpened.App
         //
         private Dictionary<int, TileEffect> _tileEffectMap;
 
-        public Tilemap(string sheetPath, int tilesX, int tilesY, TileSize tileSize, Rect viewRect)
+        private Logger _logger;
+
+        public Tilemap(TilemapConfig config, Point viewSize, Logger logger)
         {
+            _logger = logger;
+
             // Set tilemap dimensions
-            _tilesX = tilesX;
-            _tilesY = tilesY;
-            _tileSize = tileSize;
+            _tilesX = config.TilesX;
+            _tilesY = config.TilesY;
+            _tileSize = config.TilePixelSize;
+
+            _mapFolderPath = config.MapFolderPath;
 
             // Loads the tilesheet image into texture.
-            _texture = new Texture(sheetPath);
+            _texture = new Texture(config.TilesheetPath);
 
             // Calculate X and Y resolution of tilemap.
-            int resX = tilesX * (int)_tileSize;
-            int resY = tilesY * (int)_tileSize;
+            int resX = _tilesX * (int)_tileSize;
+            int resY = _tilesY * (int)_tileSize;
 
             // Determine whether map scrolls X or Y ways.
-            _scrollsX = (resX > viewRect.W);
-            _scrollsY = (resY > viewRect.H);
+            _scrollsX = (resX > viewSize.X);
+            _scrollsY = (resY > viewSize.Y);
 
             // Pre-calculate tilemap render offsets if map scrolls X or Y ways, zero if not.
-            _offsetX = !_scrollsX ? ((viewRect.W - resX) / 2) + 8 : 0;
-            _offsetY = !_scrollsY ? ((viewRect.H - resY) / 2) + 8 : 0;
+            _offsetX = !_scrollsX ? ((viewSize.X - resX) / 2) + 8 : 0;
+            _offsetY = !_scrollsY ? ((viewSize.Y - resY) / 2) + 8 : 0;
 
             // Init positioning rects.
-            _worldRect = new Rect(0, 0, resX, resY);
+            _worldRect = new Rect(_offsetX, _offsetY, resX, resY);
 
             // Initialise grid of tiles and set all to EMPTY.
             _tileGrid = new int[_tilesX, _tilesY];
-            for (int y = 0; y < tilesY; y++)
+            for (int y = 0; y < _tilesY; y++)
             {
-                for (int x = 0; x < tilesX; x++)
+                for (int x = 0; x < _tilesX; x++)
                 {
                     _tileGrid[x, y] = 0;
                 }
             }
 
+            _tileGrid[0, 0] = 1;
+            _tileGrid[1, 0] = 1;
+            _tileGrid[2, 3] = 1;
+            _tileGrid[5, 5] = 1;
 
             _tileEffectMap = new Dictionary<int, TileEffect>()
             { 
@@ -114,6 +126,11 @@ namespace SdlSharpened.App
         public bool ScrollsX { get { return _scrollsX; } }
         public bool ScrollsY { get { return _scrollsY; } }
         public TileSize TilePixelSize { get { return _tileSize; } }
+
+        public void Init() 
+        {
+            
+        }
 
         public void Save()
         {
@@ -133,19 +150,19 @@ namespace SdlSharpened.App
             tileStream += ";";
 
             // Write tilemap string to file
-            File.WriteAllText("D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\map\\mapsave.csv", tileStream);
+            File.WriteAllText($"{_mapFolderPath}mapsave.csv", tileStream);
         }
 
         // TODO: Bad. Factor out CSV parser, possibly deserializer. This will break very easily.
         public void Load()
         {
             // Read tilemap string from file.
-            string rawText = File.ReadAllText("D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\map\\mapsave.csv");
+            string rawText = File.ReadAllText($"{_mapFolderPath}mapsave.csv");
 
             // TODO: Sanitize.
             string mapStream = rawText;
 
-            // Extract dimension and tile string from mapStream string.
+            // Extract dimensions and tile string from mapStream string.
             int firstSemiIdx = mapStream.IndexOf(';');
             string dimStream = mapStream.Substring(0, firstSemiIdx);
             // TODO: Don't rely on adding literals to get the right results
@@ -157,11 +174,26 @@ namespace SdlSharpened.App
 
             _tilesX = xDim;
             _tilesY = yDim;
-            _tileGrid = new int[_tilesX, _tilesY];
+
+            // Calculate X and Y resolution of tilemap.
+            int resX = _tilesX * (int)_tileSize;
+            int resY = _tilesY * (int)_tileSize;
+
+            // Determine whether map scrolls X or Y ways.
+            _scrollsX = (resX > 640);
+            _scrollsY = (resY > 480);
+
+            // Pre-calculate tilemap render offsets if map scrolls X or Y ways, zero if not.
+            _offsetX = !_scrollsX ? ((640 - resX) / 2) + 8 : 0;
+            _offsetY = !_scrollsY ? ((480 - resY) / 2) + 8 : 0;
+
+            // Init positioning rects.
+            _worldRect = new Rect(_offsetX, _offsetY, resX, resY);
 
             int[] tileVals = tileStream.Split(',').Select((n) => Convert.ToInt32(n)).ToArray();
 
             int c = 0;
+            _tileGrid = new int[_tilesX, _tilesY];
             for (int y = 0; y < _tilesY; y++)
             {
                 for (int x = 0; x < _tilesX; x++)
@@ -170,6 +202,8 @@ namespace SdlSharpened.App
                     c += 1;
                 }
             }
+
+            //_logger.Info($"Loaded map from folder: {_mapFolderPath}");
         }
 
         public void Render(Renderer renderer, Rect viewRect)
@@ -206,28 +240,56 @@ namespace SdlSharpened.App
             }
         }
 
-        public TileEffect[,] LocalTiles(Point pos)
+        // Might delete, helps player determine tilemap collision
+        public CollisionTile[] GetEffectTilesInView(Rect viewRect) 
         {
-            Point tile = TileFromPos(pos, (int)_tileSize);
+            // Calculate dimensions
+            int startX = viewRect.X / (int)_tileSize;
+            int startY = viewRect.Y / (int)_tileSize;
+            int inViewX = (int)Math.Ceiling((double)viewRect.W / (double)_tileSize);
+            int inViewY = (int)Math.Ceiling((double)viewRect.H / (double)_tileSize);
+            int endX = _offsetX == 0 ? endX = startX + (viewRect.W / (int)_tileSize) : _tilesX;
+            int endY = _offsetY == 0 ? endY = startY + (viewRect.W / (int)_tileSize) : _tilesY;
+
+            var effectTiles = new List<CollisionTile>();
+
+            for (int y = startY; y < endY; y++)
+            {
+                for (int x = startX; x < endX; x++)
+                {
+                    var effect = GetTileEffect(_tileGrid[x, y]);
+                    if (effect != TileEffect.None) 
+                    {
+                        effectTiles.Add(new CollisionTile(effect, TileToWorldRect(new Point(x, y))));
+                    }
+                }
+            }
+
+            return effectTiles.ToArray();
+        }
+
+        public CollisionTile[] LocalTiles(Point worldPos)
+        { 
+            Point tile = PosToTile(worldPos);
 
             int startX = (tile.X > 0) ? tile.X - 1 : 0;
             int startY = (tile.Y > 0) ? tile.Y - 1 : 0;
             int endX = (tile.X < _tilesX) ? tile.X + 1 : tile.X;
             int endY = (tile.Y < _tilesY) ? tile.Y + 1 : tile.Y;
 
-            TileEffect[,] localTiles = new TileEffect[3, 3];
-            int lx = 0;
-            int ly = 0;
-            for (int y = startY; y <= endY; y++)
+            CollisionTile[] localTiles = new CollisionTile[9];
+            int c = 0;
+            for (int y = startY; y < endY; y++)
             {
-                for (int x = startX; x <= endX; x++)
+                for (int x = startX; x < endX; x++)
                 {
-                    localTiles[lx, ly] = GetTileEffect(_tileGrid[x, y]);
-                    lx += 1;
+                    var effect = GetTileEffect(_tileGrid[x, y]);
+                    var tilePos = TileToPos(new Point(x, y));
+                    var worldRect = new Rect(tilePos.X, tilePos.Y, (int)_tileSize, (int)_tileSize);
 
+                    localTiles[c] = new CollisionTile(effect, worldRect);
+                    c += 1;
                 }
-                ly += 1;
-                lx = 0;
             }
 
             return localTiles;
@@ -261,14 +323,22 @@ namespace SdlSharpened.App
             return srcRect;
         }
 
-        // Gets the current XY tile from a world position.
-        private Point TileFromPos(Point pos, int tileSize)
+        // TODO: Get rid of some of these.
+        private Rect TileToWorldRect(Point tilePos) 
         {
-            return new Point() { X = (pos.X / tileSize) + _offsetX, Y = (pos.Y / tileSize) + _offsetY };
+            return new Rect((tilePos.X * (int)_tileSize) + _offsetX, 
+                            (tilePos.Y * (int)_tileSize) + _offsetY, 
+                            (int)_tileSize, (int)_tileSize);
+        }
+
+        // Gets the current XY tile from a world position.
+        private Point PosToTile(Point pos)
+        {
+            return new Point() { X = ((pos.X - _offsetX) / (int)_tileSize), Y = ((pos.Y - _offsetY) / (int)_tileSize) };
         }
 
         // Gets the XY world position from the current XY tile.
-        public Point PosFromTile(Point tile)
+        public Point TileToPos(Point tile)
         {
             return new Point()
             {
@@ -279,7 +349,7 @@ namespace SdlSharpened.App
 
         // Used to position player on first tile in map
         // Returns a point representing the position of the first non-solid tile in the tilemap. Used to place entities.
-        public Point FirstTilePos()
+        public Point FirstAvailableTile()
         {
             var posPoint = new Point(0, 0);
 
@@ -289,10 +359,8 @@ namespace SdlSharpened.App
                 {
                     if (_tileGrid[x, y] == 0)
                     {
-                        posPoint = PosFromTile(new Point(x, y));
-
-                        posPoint.X -= 10;
-                        posPoint.Y -= 10;
+                        posPoint.X = x;
+                        posPoint.Y = y;
 
                         return posPoint;
                     }
@@ -309,11 +377,16 @@ namespace SdlSharpened.App
         }
 
         //
-        private TileEffect GetTileEffect(int tileType) 
+        private TileEffect GetTileEffect(int tileType)
         {
             _tileEffectMap.TryGetValue(tileType, out var tileEffect);
 
             return tileEffect;
-        } 
+        }
+
+        public void SetTile(Point tilePos, int tileType) 
+        {
+            _tileGrid[tilePos.X, tilePos.Y] = tileType;
+        }
     }
 }

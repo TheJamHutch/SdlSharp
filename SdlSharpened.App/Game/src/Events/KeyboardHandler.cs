@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using SDL2;
 
-namespace SdlSharpened
+namespace SdlSharpened.App
 {
     /// <summary>
     ///   This class is responsible for handling keyboard input.

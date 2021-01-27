@@ -5,8 +5,6 @@ namespace SdlSharpened.App
 {
     public class Enemy : IMoveable, IRenderable
     {
-        
-
         private Rect _worldRect;
         private Rect _viewRect;
         private MoveDirection _moveDirection = MoveDirection.None;

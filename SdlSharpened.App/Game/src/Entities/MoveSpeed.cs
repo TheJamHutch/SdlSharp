@@ -6,7 +6,7 @@ namespace SdlSharpened.App
 {
     public enum MoveSpeed
     {
-        VerySlow = 2,
+        VerySlow = 1,
         Slow = 4,
         Medium = 7,
         Fast = 15,

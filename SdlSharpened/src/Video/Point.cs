@@ -40,6 +40,12 @@ namespace SdlSharpened
             _sdlPoint = new SDL.SDL_Point() { x = pointX, y = pointY };
         }
 
+        // Copy ctor
+        public Point(Point point)
+        {
+            _sdlPoint = new SDL.SDL_Point() { x = point.X, y = point.Y };
+        }
+
         public override string ToString()
         {
             return $"X: {_sdlPoint.x}, Y: {_sdlPoint.y}";

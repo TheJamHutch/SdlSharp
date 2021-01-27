@@ -106,12 +106,13 @@ namespace SdlSharpened
         /// <param name="rect">The Rect object.</param>
         /// <param name="otherRect">The other Rect.</param>
         /// <returns>True if both Rects are equal.</returns>
-        public bool IntersectsWith(Rect otherRect)
+        public bool IntersectsWith(Rect otherRect, out Rect resultRect)
         {
-            // Ignore resultRect
-            var result = SDL.SDL_IntersectRect(ref _sdlRect, ref otherRect._sdlRect, out var resultRect);
+            var sdlBool = SDL.SDL_IntersectRect(ref _sdlRect, ref otherRect._sdlRect, out var sdlRect);
 
-            return (result == SDL.SDL_bool.SDL_TRUE) ? true : false;
+            resultRect = new Rect(sdlRect.x, sdlRect.y, sdlRect.w, sdlRect.h);
+
+            return (sdlBool == SDL.SDL_bool.SDL_TRUE) ? true : false;
         }
 
         public override string ToString()

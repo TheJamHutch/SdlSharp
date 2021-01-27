@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using SDL2;
 
-namespace SdlSharpened
+namespace SdlSharpened.App
 {
     public class GamepadHandler
     {

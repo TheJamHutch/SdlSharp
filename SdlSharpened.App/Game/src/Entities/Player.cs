@@ -25,7 +25,7 @@ namespace SdlSharpened.App
     public class Player : IMoveable, IRenderable
     {
         private MoveDirection _moveDirection = MoveDirection.None;
-        private MoveSpeed _moveSpeed = MoveSpeed.Medium;
+        private MoveSpeed _moveSpeed;
         private Point _centerView;
         private Rect _worldRect;
         private Rect _viewRect;
@@ -33,6 +33,10 @@ namespace SdlSharpened.App
         private ITilemap _tilemap;
         private Camera _camera;
         private Texture _texture;
+
+        private Point _spriteSize;
+
+        private Logger _logger;
 
         private Animation _currentAnimation;
 
@@ -45,29 +49,21 @@ namespace SdlSharpened.App
             { "WalkWest", new Animation(new Point(0, 3), 5, 3) }
         };
 
-        // TODO: rename
-       // event NewFrameEventHandler _newFrameEventHandler;
-
-        public Player(ITilemap tilemap, Camera camera, Rect spriteRect)
+        public Player(EntitiesConfig config, ITilemap tilemap, Camera camera, Logger logger)
         {
+            // Set dependencies
             _tilemap = tilemap;
             _camera = camera;
+            _logger = logger;
 
-            int centerX = camera.WorldRect.X + (camera.WorldRect.W / 2 - spriteRect.W / 2);
-            int centerY = camera.WorldRect.Y + (camera.WorldRect.H / 2 - spriteRect.H / 2);
+            // Set values from config
+            _texture = new Texture(config.PlayerSheetPath, ColourType.Magenta);
+            _spriteSize = new Point(config.PlayerSpriteSize);
+            _clipRect = new Rect(0, 0, _spriteSize.X, _spriteSize.Y);
+            _moveSpeed = config.PlayerMoveSpeed;
 
-            _centerView = new Point(centerX, centerY);
-
-            // Use spriteRect.X/Y to position player. 
-            var initPos = new Point(200, 200);
-
-            _texture = new Texture("D:\\Programming\\C#\\Projects\\SdlSharpened\\SdlSharpened.App\\Game\\img\\player.bmp", ColourType.Magenta);
-            
-            _worldRect = new Rect(initPos.X, initPos.Y, spriteRect.W, spriteRect.H);
-            _viewRect = new Rect(initPos.X, initPos.Y, spriteRect.W, spriteRect.H);
-            _clipRect = new Rect(0, 0, spriteRect.W, spriteRect.H);
-            // Subscribe to game for new frame updates
-            //_newFrameEventHandler += Foo;
+            Init();
+            Game.ReloadEvent += () => Init();
 
             _currentAnimation = _animationDictionary["default"];
         }
@@ -76,6 +72,21 @@ namespace SdlSharpened.App
         public Rect ViewRect { get { return _viewRect; } }
         public MoveDirection Direction { get { return _moveDirection; } set { _moveDirection = value; } }
         public MoveSpeed Speed { get { return _moveSpeed; } set { _moveSpeed = value; } }
+
+        public void Init() 
+        {
+            int centerX = _camera.WorldRect.X + (_camera.WorldRect.W / 2 - _spriteSize.X / 2);
+            int centerY = _camera.WorldRect.Y + (_camera.WorldRect.H / 2 - _spriteSize.Y / 2);
+
+            _centerView = new Point(centerX, centerY);
+
+            var initPos = _tilemap.TileToPos(_tilemap.FirstAvailableTile());
+
+            _worldRect = new Rect(initPos.X, initPos.Y, _spriteSize.X, _spriteSize.Y);
+            _viewRect = new Rect(initPos.X, initPos.Y, _spriteSize.X, _spriteSize.Y);
+
+            _logger.Info($"Positioned player sprite on first available tile: {initPos.X}, {initPos.Y}");
+        }
 
         public void Render(Renderer renderer)
         {
@@ -95,57 +106,66 @@ namespace SdlSharpened.App
                 case MoveDirection.South:
                     _currentAnimation = _animationDictionary["WalkSouth"];
                     break;
+                case MoveDirection.West:
+                    _currentAnimation = _animationDictionary["WalkWest"];
+                    break;
                 default:
                     _currentAnimation = _animationDictionary["default"];
                     break;
             }
 
             bool collide = Collision();
-            Animate();
+            //Animate();
             Move(collide);
         }
 
         private bool Collision() 
         {
-            int playerX = _worldRect.X;
-            int playerY = _worldRect.Y;
-
-            const int EMPTY_TILE = -1;
-            int padX = 16;
-            int padY = 16;
-
-            switch (_moveDirection)
-            {
-                case MoveDirection.North:
-                    padY = 32;
-                    break;
-                case MoveDirection.East:
-                    padX = 0;
-                    break;
-                case MoveDirection.South:
-                    padY = 0;
-                    break;
-                case MoveDirection.West:
-                    padX = 32;
-                    break;
-            }
-
-            //TileEffect[,] localTiles = _tilemap.LocalTiles(new Point(_worldRect.X + padX, _worldRect.Y + padY));
-
             return ( 
-                    // Check player edge of tilemap collision
-                    (playerY < 1) && (_moveDirection == MoveDirection.North) ||
-                    ((playerX < 1) && (_moveDirection == MoveDirection.West)) ||
-                    (((playerY + 32) >= _tilemap.WorldRect.H - 32) && (_moveDirection == MoveDirection.South)) ||
-                    (((playerX + 32) >= _tilemap.WorldRect.W - 32) && (_moveDirection == MoveDirection.East))
-
-                    // Check player tilemap collision
-                    //(localTiles[1, 0] == TileEffect.Solid && _moveDirection == MoveDirection.North) ||
-                    //(localTiles[2, 1] == TileEffect.Solid && _moveDirection == MoveDirection.East) /*||
-                    //(localTiles[1, 2] == TileEffect.Solid && _moveDirection == MoveDirection.South) ||
-                    //(localTiles[0, 1] == TileEffect.Solid && _moveDirection == MoveDirection.West)*/
+                    MapEdgeCollision() ||
+                    TileCollision()
 
                     ) ? true : false;
+        }
+
+        private bool MapEdgeCollision()
+        { 
+            return   (_worldRect.Y <= _tilemap.WorldRect.Y) && (_moveDirection == MoveDirection.North) ||
+                     (_worldRect.X <= _tilemap.WorldRect.X) && (_moveDirection == MoveDirection.West) ||
+                    ((_worldRect.Y + _worldRect.H) >= _tilemap.WorldRect.Y + _tilemap.WorldRect.H) && (_moveDirection == MoveDirection.South) ||
+                    ((_worldRect.X + _worldRect.W) >= _tilemap.WorldRect.X + _tilemap.WorldRect.W) && (_moveDirection == MoveDirection.East)
+
+                    ? true : false;
+        }
+
+        private bool TileCollision()
+        {
+        /*
+            var localTiles = _tilemap.LocalTiles(new Point(_worldRect.X + 16, _worldRect.Y + 16));
+            bool result = false;
+
+            foreach (var tile in localTiles)
+            {
+                //Console.WriteLine(tile.WorldRect);
+            /*
+                if (tile.Effect == TileEffect.Solid) 
+                {
+                    if (_worldRect.IntersectsWith(tile.WorldRect, out var resultRect))
+                    {
+                        Console.WriteLine("Collsion\n");
+                    }
+                }
+                */
+            //}
+            //Console.WriteLine();
+
+            return false;
+        }
+
+        private MoveDirection IntersectRectDirection(Rect intersectRect)
+        {
+            Console.WriteLine(intersectRect);
+            return MoveDirection.None;
         }
 
         private int _frameCounter = 0;
@@ -183,37 +203,43 @@ namespace SdlSharpened.App
 
         private void Move(bool collide) 
         {
-            if (_camera.LockW)
+            if (_tilemap.ScrollsX)
             {
-                if (_viewRect.X > _centerView.X)
+                if (_camera.LockW)
                 {
-                    _camera.LockW = false;
-                    _viewRect.X = _centerView.X;
+                    if (_viewRect.X > _centerView.X)
+                    {
+                        _camera.LockW = false;
+                        _viewRect.X = _centerView.X;
+                    }
                 }
-            }
-            else if (_camera.LockE)
-            {
-                if (_viewRect.X < _centerView.X)
+                else if (_camera.LockE)
                 {
-                    _camera.LockE = false;
-                    _viewRect.X = _centerView.X;
+                    if (_viewRect.X < _centerView.X)
+                    {
+                        _camera.LockE = false;
+                        _viewRect.X = _centerView.X;
+                    }
                 }
             }
 
-            if (_camera.LockN)
+            if (_tilemap.ScrollsY)
             {
-                if (_viewRect.Y > _centerView.Y)
+                if (_camera.LockN)
                 {
-                    _camera.LockN = false;
-                    _viewRect.Y = _centerView.Y;
+                    if (_viewRect.Y > _centerView.Y)
+                    {
+                        _camera.LockN = false;
+                        _viewRect.Y = _centerView.Y;
+                    }
                 }
-            }
-            else if (_camera.LockS)
-            {
-                if (_viewRect.Y < _centerView.Y)
+                else if (_camera.LockS)
                 {
-                    _camera.LockS = false;
-                    _viewRect.Y = _centerView.Y;
+                    if (_viewRect.Y < _centerView.Y)
+                    {
+                        _camera.LockS = false;
+                        _viewRect.Y = _centerView.Y;
+                    }
                 }
             }
 
@@ -264,5 +290,7 @@ namespace SdlSharpened.App
             _clipRect.X = framePos.X * 32;
             _clipRect.Y = framePos.Y * 32;
         }
+
+        
     }
 }

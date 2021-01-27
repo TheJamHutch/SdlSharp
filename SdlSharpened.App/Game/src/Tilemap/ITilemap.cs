@@ -15,12 +15,16 @@ namespace SdlSharpened.App
 
         void Load();
 
-        TileEffect[ , ] LocalTiles(Point tilePos);
+        CollisionTile[] LocalTiles(Point worldPos);
 
-        Point PosFromTile(Point tile);
+        Point TileToPos(Point tile);
 
-        Point FirstTilePos();
+        Point FirstAvailableTile();
 
         int GetTileType(Point tile);
+
+        CollisionTile[] GetEffectTilesInView(Rect viewRect);
+
+        void SetTile(Point tilePos, int tileType);
     }
 }
