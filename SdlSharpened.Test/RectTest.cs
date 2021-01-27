@@ -30,7 +30,7 @@ namespace SdlSharpened.Test
             Rect rect1 = new Rect(0, 1, 2, 3);
             Rect rect2 = new Rect(0, 1, 2, 3);
 
-            var result = rect1.IsEqualTo(rect2);
+            var result = rect1.Equals(rect2);
 
             result.Should().BeTrue();
         }
@@ -41,7 +41,7 @@ namespace SdlSharpened.Test
             Rect rect1 = new Rect(0, 1, 2, 3);
             Rect rect2 = new Rect(4, 5, 6, 7);
 
-            var result = rect1.IsEqualTo(rect2);
+            var result = rect1.Equals(rect2);
 
             result.Should().BeFalse();
         }

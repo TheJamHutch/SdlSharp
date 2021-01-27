@@ -4,14 +4,14 @@ using SDL2;
 namespace SdlSharpened
 {
     /// <summary>
-    ///   Class represents a rendering context used to render to the window.
+    ///   A class that contains a rendering state..
     /// </summary>
     public class Renderer
     {
         /// <summary>
-        ///   A pointer to the internal SDL renderer.
+        ///   A pointer to SDL's internal SDL_Renderer struct.
         /// </summary>
-        public IntPtr Pointer { get; }
+        public IntPtr SdlRenderer { get; }
 
         private IntPtr _sdlDefaultTarget;
 
@@ -20,14 +20,36 @@ namespace SdlSharpened
         /// </summary>
         public Renderer(Window window)
         {
-            Pointer = SDL.SDL_CreateRenderer(window.SdlWindow, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
-            SdlSystem.RendererPointer = Pointer;
-            _sdlDefaultTarget = SDL.SDL_GetRenderTarget(Pointer);
+            SdlRenderer = SDL.SDL_CreateRenderer(window.SdlWindow, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
+            SdlSystem.RendererPointer = SdlRenderer;
+            _sdlDefaultTarget = SDL.SDL_GetRenderTarget(SdlRenderer);
         }
 
         ~Renderer() 
         {
-            SDL.SDL_DestroyRenderer(Pointer);
+            SDL.SDL_DestroyRenderer(SdlRenderer);
+        }
+
+        /// <summary>
+        ///   Use this function to get the blend mode used for drawing operations.
+        /// </summary>
+        /// <returns>
+        ///   The current BlendMode.
+        /// </returns>
+        public BlendMode GetDrawBlendMode() 
+        {
+            SDL.SDL_GetRenderDrawBlendMode(SdlRenderer, out var sdlBlendMode);
+
+            return (BlendMode)sdlBlendMode;
+        }
+
+        /// <summary>
+        ///   Use this function to set the blend mode used for drawing operations.
+        /// </summary>
+        /// <param name="blendMode">The BlendMode used for blending.</param>
+        public void SetDrawBlendMode(BlendMode blendMode)
+        {
+            SDL.SDL_SetRenderDrawBlendMode(SdlRenderer, (SDL.SDL_BlendMode)blendMode);
         }
 
         /// <summary>
@@ -36,7 +58,7 @@ namespace SdlSharpened
         /// <returns>A colour type enum representing the current renderer draw colour.</returns>
         public ColourType GetDrawColour() 
         {
-            SDL.SDL_GetRenderDrawColor(Pointer, out byte r, out byte g, out byte b, out var a);
+            SDL.SDL_GetRenderDrawColor(SdlRenderer, out byte r, out byte g, out byte b, out var a);
 
             ColourType colour = ColourType.Black;
             colour.SetFromBytes(r, g, b);
@@ -52,12 +74,12 @@ namespace SdlSharpened
         {
             colour.ColourBytes(out var r, out var g, out var b);
 
-            SDL.SDL_SetRenderDrawColor(Pointer, r, g, b, 0xff);
+            SDL.SDL_SetRenderDrawColor(SdlRenderer, r, g, b, 0xff);
         }
 
         public void GetTarget() 
         {
-            SDL.SDL_GetRenderTarget(Pointer);
+            SDL.SDL_GetRenderTarget(SdlRenderer);
         }
 
         /// <summary>
@@ -68,12 +90,12 @@ namespace SdlSharpened
         /// </param>
         public void SetTarget(Texture texture)
         {
-            SDL.SDL_SetRenderTarget(Pointer, texture.Pointer);
+            SDL.SDL_SetRenderTarget(SdlRenderer, texture.Pointer);
         }
 
         public void ResetTarget() 
         {
-            SDL.SDL_SetRenderTarget(Pointer, _sdlDefaultTarget);
+            SDL.SDL_SetRenderTarget(SdlRenderer, _sdlDefaultTarget);
         }
 
         /// <summary>
@@ -81,7 +103,7 @@ namespace SdlSharpened
         /// </summary>
         public void Clear() 
         {
-            SDL.SDL_RenderClear(Pointer);
+            SDL.SDL_RenderClear(SdlRenderer);
         }
 
         /// <summary>
@@ -95,7 +117,7 @@ namespace SdlSharpened
             var src = srcRect.SdlRect;
             var dst = dstRect.SdlRect;
 
-            SDL.SDL_RenderCopy(Pointer, texture.Pointer, ref src, ref dst);
+            SDL.SDL_RenderCopy(SdlRenderer, texture.Pointer, ref src, ref dst);
         }
 
         public void CopyEx() 
@@ -108,7 +130,7 @@ namespace SdlSharpened
        /// </summary>
         public void Present() 
         {
-            SDL.SDL_RenderPresent(Pointer);
+            SDL.SDL_RenderPresent(SdlRenderer);
         }
 
 
@@ -125,7 +147,7 @@ namespace SdlSharpened
         /// <param name="ypos">The Y position value.</param>
         public void DrawPoint(int xpos, int ypos)
         {
-            SDL.SDL_RenderDrawPoint(Pointer, xpos, ypos);
+            SDL.SDL_RenderDrawPoint(SdlRenderer, xpos, ypos);
         }
 
         /// <summary>
@@ -134,7 +156,7 @@ namespace SdlSharpened
         /// <param name="point"></param>
         public void DrawPoint(Point point)
         {
-            SDL.SDL_RenderDrawPoint(Pointer, point.SdlPoint.x, point.SdlPoint.y);
+            SDL.SDL_RenderDrawPoint(SdlRenderer, point.SdlPoint.x, point.SdlPoint.y);
         }
 
         /// <summary>
@@ -144,7 +166,7 @@ namespace SdlSharpened
         public void DrawRect(Rect rect) 
         {
             SDL.SDL_Rect sdlRect = rect.SdlRect;
-            SDL.SDL_RenderDrawRect(Pointer, ref sdlRect);
+            SDL.SDL_RenderDrawRect(SdlRenderer, ref sdlRect);
         }
 
         /// <summary>
@@ -157,7 +179,7 @@ namespace SdlSharpened
             SDL.SDL_Rect sdlRect = rect.SdlRect;
             ColourType prevColour = GetDrawColour();
             SetDrawColour(colour);
-            SDL.SDL_RenderDrawRect(Pointer, ref sdlRect);
+            SDL.SDL_RenderDrawRect(SdlRenderer, ref sdlRect);
             SetDrawColour(prevColour);
         }
 
@@ -168,7 +190,7 @@ namespace SdlSharpened
         public void FillRect(Rect rect)
         {
             SDL.SDL_Rect sdlRect = rect.SdlRect;
-            SDL.SDL_RenderFillRect(Pointer, ref sdlRect);
+            SDL.SDL_RenderFillRect(SdlRenderer, ref sdlRect);
         }
 
         /// <summary>
@@ -181,7 +203,7 @@ namespace SdlSharpened
             SDL.SDL_Rect sdlRect = rect.SdlRect;
             ColourType prevColour = GetDrawColour();
             SetDrawColour(colour);
-            SDL.SDL_RenderFillRect(Pointer, ref sdlRect);
+            SDL.SDL_RenderFillRect(SdlRenderer, ref sdlRect);
             SetDrawColour(prevColour);
         }
 

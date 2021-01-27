@@ -8,8 +8,6 @@ namespace SdlSharpened.App
         private Rect _worldRect;
         private Rect _viewRect;
 
-        private Point _viewSize;
-
         private MoveSpeed _moveSpeed;
         private MoveDirection _moveDirection = MoveDirection.None;
 
@@ -17,14 +15,14 @@ namespace SdlSharpened.App
 
         private Logger _logger;
 
-        public Camera(EntitiesConfig config, ITilemap tilemap, Point viewSize, Logger logger)
+        public Camera(EntitiesConfig config, ITilemap tilemap, Rect viewRect, Logger logger)
         {
             _tilemap = tilemap;
             _logger = logger;
 
             // Set camera's init movement speed. Read from config.
             _moveSpeed = config.CameraMoveSpeed;
-            _viewSize = viewSize;
+            _viewRect = viewRect;
 
             Init();
             Game.ReloadEvent += () => Init();
@@ -43,11 +41,10 @@ namespace SdlSharpened.App
 
         public void Init() 
         {
-            int mapX = (_tilemap.ScrollsX) ? _tilemap.WorldRect.X : 0;
-            int mapY = (_tilemap.ScrollsY) ? _tilemap.WorldRect.Y : 0;
+            //int mapX = (_tilemap.ScrollsX) ? _tilemap.WorldRect.X : 0;
+            //int mapY = (_tilemap.ScrollsY) ? _tilemap.WorldRect.Y : 0;
 
-            _worldRect = new Rect(mapX, mapY, _viewSize.X, _viewSize.Y);
-            _viewRect = new Rect(0, 0, _viewSize.X, _viewSize.Y);
+            _worldRect = new Rect(0, 0, _viewRect.W, _viewRect.H);
 
             InitLocks();
 

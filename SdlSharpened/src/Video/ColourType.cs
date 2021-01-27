@@ -10,6 +10,7 @@ namespace SdlSharpened
     {
         Black = 0,
         Red,
+        DarkRed,
         Green,
         Blue,
         Cyan, 
@@ -36,6 +37,7 @@ namespace SdlSharpened
             {
                 case ColourType.Black: { r = 0; g = 0; b = 0; } break;
                 case ColourType.Red: { r = 0xff; g = 0; b = 0; } break;
+                case ColourType.DarkRed: { r = 0x66; g = 0; b = 0; } break;
                 case ColourType.Green: { r = 0; g = 0xff; b = 0; } break;
                 case ColourType.Blue: { r = 0; g = 0; b = 0xff; } break;
                 case ColourType.Cyan: { r = 0; g = 0xff; b = 0xff; } break;
@@ -64,6 +66,10 @@ namespace SdlSharpened
             else if (r == 0xff && g == 0 && b == 0)
             {
                 colour = ColourType.Red;
+            }
+            else if (r == 0x66 && g == 0 && b == 0)
+            {
+                colour = ColourType.DarkRed;
             }
             else if (r == 0 && g == 0xff && b == 0)
             {

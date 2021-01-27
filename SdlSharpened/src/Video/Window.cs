@@ -9,7 +9,7 @@ namespace SdlSharpened
     public class Window
     {
         /// <summary>
-        ///    A pointer to the internal SDL window.
+        ///    A pointer to SDL's internal SDL_Window struct.
         /// </summary>
         public IntPtr SdlWindow { get { return _sdlWindow; } }
 

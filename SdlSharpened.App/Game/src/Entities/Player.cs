@@ -1,6 +1,4 @@
 ﻿/* 
-**
-**
 */
 using System;
 using System.Collections.Generic;
@@ -75,17 +73,16 @@ namespace SdlSharpened.App
 
         public void Init() 
         {
-            int centerX = _camera.WorldRect.X + (_camera.WorldRect.W / 2 - _spriteSize.X / 2);
-            int centerY = _camera.WorldRect.Y + (_camera.WorldRect.H / 2 - _spriteSize.Y / 2);
+            int centerX = _camera.ViewRect.X + (_camera.ViewRect.W / 2 - _spriteSize.X / 2);
+            int centerY = _camera.ViewRect.Y + (_camera.ViewRect.H / 2 - _spriteSize.Y / 2);
 
+            // TODO: Clean this up
             _centerView = new Point(centerX, centerY);
-
-            var initPos = _tilemap.TileToPos(_tilemap.FirstAvailableTile());
-
-            _worldRect = new Rect(initPos.X, initPos.Y, _spriteSize.X, _spriteSize.Y);
+            var initPos = new Point(_camera.ViewRect.X + 32, _camera.ViewRect.Y + 32); // _tilemap.TileToPos(_tilemap.FirstAvailableTile());
+            _worldRect = new Rect(initPos.X - _camera.ViewRect.X, initPos.Y - _camera.ViewRect.Y, _spriteSize.X, _spriteSize.Y);
             _viewRect = new Rect(initPos.X, initPos.Y, _spriteSize.X, _spriteSize.Y);
 
-            _logger.Info($"Positioned player sprite on first available tile: {initPos.X}, {initPos.Y}");
+            _logger.Info($"Player - Positioned player sprite on first available tile: {initPos.X}, {initPos.Y}");
         }
 
         public void Render(Renderer renderer)
@@ -129,7 +126,7 @@ namespace SdlSharpened.App
         }
 
         private bool MapEdgeCollision()
-        { 
+        {
             return   (_worldRect.Y <= _tilemap.WorldRect.Y) && (_moveDirection == MoveDirection.North) ||
                      (_worldRect.X <= _tilemap.WorldRect.X) && (_moveDirection == MoveDirection.West) ||
                     ((_worldRect.Y + _worldRect.H) >= _tilemap.WorldRect.Y + _tilemap.WorldRect.H) && (_moveDirection == MoveDirection.South) ||
