@@ -9,17 +9,13 @@ namespace SdlSharpened.App
 {
     public class Game
     {
-        public static bool NewFrame { get; set; } = false;
-
         // The delegate for a game reload handler.
         public static event Action ReloadEvent;
-
 
         // True when the game is running.
         private bool _running;
         // The maximum time (in milliseconds) to wait before the game renders the next frame.
         private int _frameDelay;
-        private Point _viewSize;
 
         // SdlSharpened objects
         private SdlSystem _system;
@@ -35,31 +31,23 @@ namespace SdlSharpened.App
         private Tilemap _tilemap;
         private BitmapText _bitmapText;
 
-        // Map editor stuff
-        private Rect _cursorRect = new Rect(0, 0, 32, 32);
-        private TilemapEditor _tilemapEditor;
-
         // Constructs the game object along with all other aggregate objects.
         public Game()
         {
             _logger = new Logger();
             _config = new GameConfig();
-            _viewSize = new Point(_config.WindowResolution.X, _config.WindowResolution.Y);
-            _logger.Info($"Using viewport size from config: {_viewSize.X}, {_viewSize.Y}");
 
             // Instantiate game objects
             _system = new SdlSystem();
-            _window = new Window(_config.WindowTitle, _viewSize.X, _viewSize.Y);
+            _window = new Window(_config.WindowTitle, _config.WindowResolution.X, _config.WindowResolution.Y);
             _renderer = new Renderer(_window);
             _eventHandler = new EventHandler();
 
-            // Create in order: Tilemap -> Camera -> Player -> Enemies
-            _tilemap = new Tilemap(_config.Tilemap, _viewSize, _logger);
-            _camera = new Camera(_config.Entities, _tilemap, _viewSize, _logger);
+            // Where, on screen, to render the tilemap
+            _tilemap = new Tilemap(_config.Tilemap, _logger);
+            _camera = new Camera(_config.Entities, _tilemap, _config.GameViewRect, _logger);
             _player = new Player(_config.Entities, _tilemap, _camera, _logger);
             _bitmapText = new BitmapText();
-
-            _tilemapEditor = new TilemapEditor(_tilemap);
 
             // Calculate frame delay. 
             _frameDelay = 1000 / _config.TargetFps;
@@ -74,28 +62,24 @@ namespace SdlSharpened.App
             _player.Update();
             _camera.Update();
             _bitmapText.Update();
-
-            _tilemapEditor.Update();
         }
 
         public void Render()
         {
-            // Render background.
+            _renderer.FillRect(new Rect(0, 0, 640, 480), ColourType.DarkRed);
             _renderer.FillRect(_camera.ViewRect, ColourType.Black);
-            _tilemap.Render(_renderer, _camera.WorldRect);
-
-            // Render map editor cursor over top of tilemap
-            _renderer.DrawRect(_cursorRect, ColourType.Yellow);
+            _tilemap.Render(_renderer, _camera);
+            _renderer.DrawRect(_config.GameViewRect, ColourType.White);
 
             _player.Render(_renderer);
-            _tilemapEditor.Render(_renderer);
+            //_tilemapEditor.Render(_renderer);
             _bitmapText.Render(_renderer);
             _renderer.Present();
         }
 
         public void Start()
         {
-            _logger.Trace("Game running...");
+            _logger.Trace("Game - Started running...");
             _running = true;
             Run();
         }
@@ -107,14 +91,14 @@ namespace SdlSharpened.App
 
         public void Save()
         {
-            _logger.Trace("Game save");
+            _logger.Trace("Game - Save");
             // Save the current tilemap.
             _tilemap.Save();
         }
 
         public void Load()
         {
-            _logger.Trace("Game load");
+            _logger.Trace("Game - Load");
             // Load the tilemap.
             _tilemap.Load();
             // Fire reload event to tell subscribing classes to re-init.
@@ -137,9 +121,7 @@ namespace SdlSharpened.App
                 {
                     timeDiff = 1;
                 }
-                NewFrame = false;
                 Timing.Delay((uint)(33 - timeDiff));
-                NewFrame = true;
             }
         }
 
@@ -161,7 +143,8 @@ namespace SdlSharpened.App
                     () => { _camera.Direction = MoveDirection.West;  _player.Direction = MoveDirection.West; }, stopAction)),
             };
 
-            _eventHandler.Keyboard.BindKeypressActions(keypressActions) ;
+            _eventHandler.Keyboard.BindKeypressActions(keypressActions);
+            _logger.Info($"Game - Init keyboard.");
         }
 
         private void InitMouseEvents()
@@ -169,6 +152,7 @@ namespace SdlSharpened.App
             _eventHandler.Mouse.OnButtonDown((mx, my) => SetMapTile(mx, my));
             //_eventHandler.Mouse.OnButtonUp((mx, my) => Console.WriteLine($"UP: {mx}, {my}"));
             _eventHandler.Mouse.OnMotion((mx, my) => UpdateCursor(mx, my) );
+            _logger.Info($"Game - Init mouse.");
         }
 
         private void UpdateCursor(int mx, int my) 
@@ -178,8 +162,8 @@ namespace SdlSharpened.App
             int tx = ((mx - (mx % 32)) - (camX % 32));
             int ty = ((my - (my % 32)) - (camY % 32));
 
-            _cursorRect.X = tx;
-            _cursorRect.Y = ty;
+            //_cursorRect.X = tx;
+            //_cursorRect.Y = ty;
         }
 
         private void SetMapTile(int mx, int my)
@@ -190,7 +174,7 @@ namespace SdlSharpened.App
             int tx = ((camX - (camX % 32)) / 32) + ((mx - (mx % 32)) / 32);
             int ty = ((camY - (camX % 32)) / 32) + ((my - (my % 32)) / 32);
             var tilePos = new Point(tx, ty);
-            _tilemap.SetTile(tilePos, 1);
+            //_tilemap.SetTile(tilePos, 1);
         }
     }
 }
