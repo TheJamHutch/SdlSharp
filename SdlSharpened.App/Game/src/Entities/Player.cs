@@ -1,4 +1,8 @@
-﻿/* 
+﻿/* Player
+** 
+** Initial player position should be specified in game level save file. Hardcoded for now.
+** Player sprite size/ clipRect size is specified in config.
+** Only Player can unlock the camera in a particular direction by moving into center view.
 */
 using System;
 using System.Collections.Generic;
@@ -8,8 +12,11 @@ namespace SdlSharpened.App
 {
     public class Animation 
     {
+        // The X, Y cell position that the animation should start from on the tilesheet.
         public Point StartPos { get; }
+        // The number of cells in the animation. One frame of animation is a still image. Need two for it to be animated. Zero will play all animation cells, never use.
         public int CellCount { get; }
+        // The number of frames to wait for before progressing to the next animation cell.
         public int WaitFrames { get; }
 
         public Animation(Point startPos, int cellCount, int waitFrames)
@@ -40,8 +47,13 @@ namespace SdlSharpened.App
 
         private Dictionary<string, Animation> _animationDictionary = new Dictionary<string, Animation>()
         {
-            { "default", new Animation(new Point(0, 0), 1, 3) },
-            { "WalkSouth", new Animation(new Point(0, 0), 5, 3) },
+            // Directional idle animations
+            { "IdleSouth", new Animation(new Point(0, 0), 1, 3) },
+            { "IdleEast", new Animation(new Point(0, 1), 1, 3) },
+            { "IdleNorth", new Animation(new Point(0, 2), 1, 3) },
+            { "IdleWest", new Animation(new Point(0, 3), 1, 3) },
+            // Directional walking animations
+            { "WalkSouth", new Animation(new Point(0, 0), 0, 8) },
             { "WalkEast", new Animation(new Point(0, 1), 5, 3) },
             { "WalkNorth", new Animation(new Point(0, 2), 5, 3) },
             { "WalkWest", new Animation(new Point(0, 3), 5, 3) }
@@ -62,8 +74,6 @@ namespace SdlSharpened.App
 
             Init();
             Game.ReloadEvent += () => Init();
-
-            _currentAnimation = _animationDictionary["default"];
         }
 
         public Rect WorldRect { get { return _worldRect; } }
@@ -73,16 +83,18 @@ namespace SdlSharpened.App
 
         public void Init() 
         {
+            // Calculate where center view for the player sprite would be and assign to Rect.
             int centerX = _camera.ViewRect.X + (_camera.ViewRect.W / 2 - _spriteSize.X / 2);
             int centerY = _camera.ViewRect.Y + (_camera.ViewRect.H / 2 - _spriteSize.Y / 2);
-
-            // TODO: Clean this up
             _centerView = new Point(centerX, centerY);
-            var initPos = new Point(_camera.ViewRect.X + 32, _camera.ViewRect.Y + 32); // _tilemap.TileToPos(_tilemap.FirstAvailableTile());
+            // Get player init position and use to init view and world Rect's
+            var initPos = new Point(centerX, centerY);
             _worldRect = new Rect(initPos.X - _camera.ViewRect.X, initPos.Y - _camera.ViewRect.Y, _spriteSize.X, _spriteSize.Y);
             _viewRect = new Rect(initPos.X, initPos.Y, _spriteSize.X, _spriteSize.Y);
 
             _logger.Info($"Player - Positioned player sprite on first available tile: {initPos.X}, {initPos.Y}");
+
+            _currentAnimation = _animationDictionary["WalkSouth"];
         }
 
         public void Render(Renderer renderer)
@@ -92,27 +104,30 @@ namespace SdlSharpened.App
 
         public void Update()
         {
-            switch (_moveDirection) 
-            {
-                case MoveDirection.North:
-                    _currentAnimation = _animationDictionary["WalkNorth"];
-                    break;
-                case MoveDirection.East:
-                    _currentAnimation = _animationDictionary["WalkEast"];
-                    break;
-                case MoveDirection.South:
-                    _currentAnimation = _animationDictionary["WalkSouth"];
-                    break;
-                case MoveDirection.West:
-                    _currentAnimation = _animationDictionary["WalkWest"];
-                    break;
-                default:
-                    _currentAnimation = _animationDictionary["default"];
-                    break;
-            }
+
+            /*
+                switch (_moveDirection) 
+                {
+                    case MoveDirection.North:
+                        _currentAnimation = _animationDictionary["WalkNorth"];
+                        break;
+                    case MoveDirection.East:
+                        _currentAnimation = _animationDictionary["WalkEast"];
+                        break;
+                    case MoveDirection.South:
+                        _currentAnimation = _animationDictionary["WalkSouth"];
+                        break;
+                    case MoveDirection.West:
+                        _currentAnimation = _animationDictionary["WalkWest"];
+                        break;
+                    default:
+                        _currentAnimation = _animationDictionary["default"];
+                        break;
+                }*/
 
             bool collide = Collision();
-            //Animate();
+
+            Animate();
             Move(collide);
         }
 
@@ -129,8 +144,9 @@ namespace SdlSharpened.App
         {
             return   (_worldRect.Y <= _tilemap.WorldRect.Y) && (_moveDirection == MoveDirection.North) ||
                      (_worldRect.X <= _tilemap.WorldRect.X) && (_moveDirection == MoveDirection.West) ||
-                    ((_worldRect.Y + _worldRect.H) >= _tilemap.WorldRect.Y + _tilemap.WorldRect.H) && (_moveDirection == MoveDirection.South) ||
-                    ((_worldRect.X + _worldRect.W) >= _tilemap.WorldRect.X + _tilemap.WorldRect.W) && (_moveDirection == MoveDirection.East)
+                     // TODO: Get rid of these literals
+                    ((_worldRect.Y + _worldRect.H + 20) >= _tilemap.WorldRect.H) && (_moveDirection == MoveDirection.South) ||
+                    ((_worldRect.X + _worldRect.W + 10) >= _tilemap.WorldRect.W) && (_moveDirection == MoveDirection.East)
 
                     ? true : false;
         }
@@ -159,48 +175,48 @@ namespace SdlSharpened.App
             return false;
         }
 
-        private MoveDirection IntersectRectDirection(Rect intersectRect)
-        {
-            Console.WriteLine(intersectRect);
-            return MoveDirection.None;
-        }
-
         private int _frameCounter = 0;
         private int _cellCounter = 0;
 
         private void Animate() 
         {
-            if (Game.NewFrame)
-            {
-                _frameCounter++;
-            }
+            // By my calculations, this will take ~ 2.2 years to overflow
+            _frameCounter++;
 
             // On animation start/ restart
             if (_cellCounter == 0)
             {
                 SetFrame(_currentAnimation.StartPos);
-                _cellCounter++;
+               //_cellCounter++;
             }
 
-            if (_cellCounter == _currentAnimation.CellCount)
+            if (_frameCounter % _currentAnimation.WaitFrames == 0)
             {
-                _cellCounter = 0;
-                return;
-            }
-
-            if (_frameCounter == _currentAnimation.WaitFrames)
-            {
-                NextFrame();
-                _frameCounter = 0;
                 _cellCounter++;
+                if (_cellCounter == _currentAnimation.CellCount)
+                {
+                    _cellCounter = 0;
+                }
+                else 
+                {
+                    NextFrame();
+                }
 
                 
             }
+
+            
+
+            
         }
 
         private void Move(bool collide) 
         {
-            if (_tilemap.ScrollsX)
+            // Determine whether tilemap is big enough that it needs to scroll, X or Y ways.
+            bool scrollsX = (_camera.ViewRect.W < _tilemap.WorldRect.W);
+            bool scrollsY = (_camera.ViewRect.H < _tilemap.WorldRect.H);
+
+            if (scrollsX)
             {
                 if (_camera.LockW)
                 {
@@ -220,7 +236,7 @@ namespace SdlSharpened.App
                 }
             }
 
-            if (_tilemap.ScrollsY)
+            if (scrollsY) 
             {
                 if (_camera.LockN)
                 {

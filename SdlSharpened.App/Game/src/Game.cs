@@ -9,11 +9,8 @@ namespace SdlSharpened.App
 {
     public class Game
     {
-        public static bool NewFrame { get; set; } = false;
-
         // The delegate for a game reload handler.
         public static event Action ReloadEvent;
-
 
         // True when the game is running.
         private bool _running;
@@ -34,17 +31,11 @@ namespace SdlSharpened.App
         private Tilemap _tilemap;
         private BitmapText _bitmapText;
 
-        private Texture _backgroundTexture;
-
-        private Rect _screenRect;
-
         // Constructs the game object along with all other aggregate objects.
         public Game()
         {
             _logger = new Logger();
             _config = new GameConfig();
-
-            _screenRect = new Rect(0, 0, _config.WindowResolution.X, _config.WindowResolution.Y);
 
             // Instantiate game objects
             _system = new SdlSystem();
@@ -53,12 +44,10 @@ namespace SdlSharpened.App
             _eventHandler = new EventHandler();
 
             // Where, on screen, to render the tilemap
-            _tilemap = new Tilemap(_config.Tilemap, _config.TilemapViewRect, _logger);
-            _camera = new Camera(_config.Entities, _tilemap, _config.TilemapViewRect, _logger);
+            _tilemap = new Tilemap(_config.Tilemap, _logger);
+            _camera = new Camera(_config.Entities, _tilemap, _config.GameViewRect, _logger);
             _player = new Player(_config.Entities, _tilemap, _camera, _logger);
             _bitmapText = new BitmapText();
-
-            _backgroundTexture = new Texture(_config.BackgroundImagePath);
 
             // Calculate frame delay. 
             _frameDelay = 1000 / _config.TargetFps;
@@ -72,18 +61,19 @@ namespace SdlSharpened.App
         {
             _player.Update();
             _camera.Update();
-            //_bitmapText.Update();
+            _bitmapText.Update();
         }
 
         public void Render()
         {
-            _renderer.FillRect(_screenRect, ColourType.DarkRed);
-            _tilemap.Render(_renderer, _camera.WorldRect);
-            _renderer.DrawRect(_config.TilemapViewRect, ColourType.White);
+            _renderer.FillRect(new Rect(0, 0, 640, 480), ColourType.DarkRed);
+            _renderer.FillRect(_camera.ViewRect, ColourType.Black);
+            _tilemap.Render(_renderer, _camera);
+            _renderer.DrawRect(_config.GameViewRect, ColourType.White);
 
             _player.Render(_renderer);
             //_tilemapEditor.Render(_renderer);
-            //_bitmapText.Render(_renderer);
+            _bitmapText.Render(_renderer);
             _renderer.Present();
         }
 
@@ -131,9 +121,7 @@ namespace SdlSharpened.App
                 {
                     timeDiff = 1;
                 }
-                NewFrame = false;
                 Timing.Delay((uint)(33 - timeDiff));
-                NewFrame = true;
             }
         }
 

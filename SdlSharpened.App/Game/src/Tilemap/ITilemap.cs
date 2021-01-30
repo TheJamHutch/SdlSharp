@@ -6,8 +6,6 @@ namespace SdlSharpened.App
 {
     public interface ITilemap
     {
-        bool ScrollsX { get; }
-        bool ScrollsY { get; }
         TileSize TilePixelSize { get; }
         Rect WorldRect { get; }
 
@@ -18,8 +16,6 @@ namespace SdlSharpened.App
         //CollisionTile[] LocalTiles(Point worldPos);
 
         //Point TileToPos(Point tile);
-
-        //Point FirstAvailableTile();
 
         //int GetTileType(Point tile);
 

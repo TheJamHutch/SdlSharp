@@ -20,7 +20,7 @@ namespace SdlSharpened
         /// </summary>
         public Renderer(Window window)
         {
-            SdlRenderer = SDL.SDL_CreateRenderer(window.SdlWindow, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
+            SdlRenderer = SDL.SDL_CreateRenderer(window.SdlWindow, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED | SDL.SDL_RendererFlags.SDL_RENDERER_TARGETTEXTURE);
             SdlSystem.RendererPointer = SdlRenderer;
             _sdlDefaultTarget = SDL.SDL_GetRenderTarget(SdlRenderer);
         }
@@ -90,7 +90,7 @@ namespace SdlSharpened
         /// </param>
         public void SetTarget(Texture texture)
         {
-            SDL.SDL_SetRenderTarget(SdlRenderer, texture.Pointer);
+            SDL.SDL_SetRenderTarget(SdlRenderer, texture.SdlTexture);
         }
 
         public void ResetTarget() 
@@ -117,7 +117,7 @@ namespace SdlSharpened
             var src = srcRect.SdlRect;
             var dst = dstRect.SdlRect;
 
-            SDL.SDL_RenderCopy(SdlRenderer, texture.Pointer, ref src, ref dst);
+            SDL.SDL_RenderCopy(SdlRenderer, texture.SdlTexture, ref src, ref dst);
         }
 
         public void CopyEx() 

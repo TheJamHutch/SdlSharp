@@ -1,20 +1,9 @@
 ﻿/*  Game Tilemap
 **
 **  Description:
-**  
-**  +----+----+----+----+
-**  |    |    |    |    |
-**  +----+----+----+----+ 
-**  +----+----+----+----+
-**  |    |    |    |    |
-**  +----+----+----+----+
-**  +----+----+----+----+
-**  |    |    |    |    |
-**  +----+----+----+----+
-**
-**  This class does not have any direct association/ dependency on any other game class, but it does need the ViewRect from the Camera.
-**  Since the Camera's ViewRect is value-type, it needs to be passed in to the constructor for intial setup AND passed into the Tilemap's
-**  Render() method to ensure that the values received are up-to-date.
+**    This class does not have any direct association/ dependency on any other game class, but it does need the ViewRect from the Camera.
+**    Since the Camera's ViewRect is value-type, it needs to be passed in to the constructor for intial setup AND passed into the Tilemap's
+**    Render() method to ensure that the values received are up-to-date.
 **  
 **  Notes:
 **    It is recommended to render a black Rect, the size of the entire view, behind this tilemap because any EMPTY tiles will be rendered
@@ -50,25 +39,21 @@ namespace SdlSharpened.App
         // Square pixel size of tiles.
         private TileSize _tileSize;
 
-        // Whether or not the tilemap scrolls X or Y ways. Tilemap scrolls when its resolution is greater than the viewport.
-        private bool _scrollsX;
-        private bool _scrollsY;
-
         // Tilesheet image texture
         private Texture _texture;
 
         // A Rect that encompasses the entire tilemap, represents its position in the game world.
         // X and Y are where the map starts ( it may be offset), and W and H are the resolution of the tilemap.
         private Rect _worldRect;
-        //
-        private Rect _viewRect;
 
         //
         private Dictionary<int, TileEffect> _tileEffectMap;
 
         private Logger _logger;
 
-        public Tilemap(TilemapConfig config, Rect viewRect, Logger logger)
+        private Texture _mapTexture;
+
+        public Tilemap(TilemapConfig config, Logger logger)
         {
             _logger = logger;
 
@@ -76,24 +61,29 @@ namespace SdlSharpened.App
             _tilesX = config.TilesX;
             _tilesY = config.TilesY;
             _tileSize = config.TilePixelSize;
-            _logger.Info($"Tilemap - Tilemap dimensions: X: {_tilesX}, Y: {_tilesY}, TileSize: {_tileSize} ({(int)_tileSize} pixels)");
 
             _mapFolderPath = config.MapFolderPath;
 
             // Loads the tilesheet image into texture.
             _texture = new Texture(config.TilesheetPath);
 
+            Init();
+        }
+
+        // Getter properties.
+        public Rect WorldRect { get { return _worldRect; } }
+        public TileSize TilePixelSize { get { return _tileSize; } }
+
+        public void Init() 
+        {
             // Calculate X and Y resolution of tilemap.
             int mapResX = _tilesX * (int)_tileSize;
             int mapResY = _tilesY * (int)_tileSize;
 
-            // Determine whether map scrolls X or Y ways.
-            _scrollsX = (mapResX > viewRect.W);
-            _scrollsY = (mapResY > viewRect.H);
+            _mapTexture = new Texture(mapResX, mapResY);
 
             // Init positioning rects.
             _worldRect = new Rect(0, 0, mapResX, mapResY);
-            _viewRect = viewRect;
 
             // Initialise grid of tiles and set all to EMPTY.
             _tileGrid = new int[_tilesX, _tilesY];
@@ -105,27 +95,61 @@ namespace SdlSharpened.App
                 }
             }
 
-            _logger.Info($"Tilemap - Tilemap memory usage: ~ {_tileGrid.Length * sizeof(int)} bytes.");
-
             // The map of tile effects
             _tileEffectMap = new Dictionary<int, TileEffect>()
-            { 
+            {
                 { 1, TileEffect.Solid },
                 { 5, TileEffect.Damage }
             };
+
+            _logger.Info($"Tilemap - Tilemap dimensions: X: {_tilesX}, Y: {_tilesY}, TileSize: {_tileSize} ({(int)_tileSize} pixels)");
+            _logger.Info($"Tilemap - Tilemap memory usage: ~ {_tileGrid.Length * sizeof(int)} bytes.");
         }
 
-        // Getter properties.
-        public Rect WorldRect { get { return _worldRect; } }
-        public Rect ViewRect { get { return _viewRect; } }
-
-        public bool ScrollsX { get { return _scrollsX; } }
-        public bool ScrollsY { get { return _scrollsY; } }
-        public TileSize TilePixelSize { get { return _tileSize; } }
-
-        public void Init() 
+        public void Render(Renderer renderer, Camera camera)
         {
-            
+            Rect srcRect = new Rect(0, 0, (int)_tileSize, (int)_tileSize);
+            Rect dstRect = new Rect(0, 0, (int)_tileSize, (int)_tileSize);
+
+            // Calculate start and end X and Y indeces for rendering.
+            int startX = camera.WorldRect.X / (int)_tileSize;
+            int startY = camera.WorldRect.Y / (int)_tileSize;
+            // Render whole row/ col if camera size is less than map resolution.
+            // Over render by one tile.
+            // Calcuate how many tiles in view X and Y ways, always round up.
+            int inViewX = (int)Math.Ceiling((double)camera.WorldRect.W / (double)_tileSize);
+            int inViewY = (int)Math.Ceiling((double)camera.WorldRect.H / (double)_tileSize);
+            // Determine whether map is big enough so that it scrolls X or Y ways.
+            bool scrollsX = (camera.ViewRect.W < _worldRect.W);
+            bool scrollsY = (camera.ViewRect.H < _worldRect.H);
+            int endX = scrollsX ? endX = startX + inViewX + 1 : _tilesX;
+            int endY = scrollsY ? endY = startY + inViewY + 1 : _tilesY;
+
+            int offsetX = (!scrollsX) ? camera.ViewRect.X + ((camera.ViewRect.W - _worldRect.W) / 2) : camera.ViewRect.X;
+            int offsetY = (!scrollsY) ? camera.ViewRect.Y + ((camera.ViewRect.H - _worldRect.H) / 2) : camera.ViewRect.Y;
+
+           //renderer.SetTarget(_mapTexture);
+
+            for (int y = startY; y < endY; y++)
+            {
+                for (int x = startX; x < endX; x++)
+                {
+                    // TODO: Index OOB exception thrown here when tilemap viewRect is 240x240 and xTiles || yTiles == 8
+                    srcRect = SetSrcRect(_tileGrid[x, y], (int)_tileSize);
+
+                    dstRect.X = offsetX + (x * (int)_tileSize - camera.WorldRect.X);
+                    dstRect.Y = offsetY + (y * (int)_tileSize - camera.WorldRect.Y);
+
+                    // Do not render empty tile.
+                    if (_tileGrid[x, y] > EMPTY_TILE)
+                    {
+                        renderer.Copy(_texture, srcRect, dstRect);
+                    }
+                }
+            }
+
+            //renderer.ResetTarget();
+            //renderer.Copy(_mapTexture, new Rect(0, 0, 128, 128), camera.ViewRect);
         }
 
         // TODO: Fails to save tilemaps that are too big, like 1000x1000
@@ -177,12 +201,8 @@ namespace SdlSharpened.App
             int resX = _tilesX * (int)_tileSize;
             int resY = _tilesY * (int)_tileSize;
 
-            // Determine whether map scrolls X or Y ways.
-            _scrollsX = (resX > 640);
-            _scrollsY = (resY > 480);
-
             // Init positioning rects.
-            _worldRect = new Rect(_viewRect.X, _viewRect.Y, resX, resY);
+            _worldRect = new Rect(0, 0, resX, resY);
 
             int[] tileVals = tileStream.Split(',').Select((n) => Convert.ToInt32(n)).ToArray();
 
@@ -198,41 +218,6 @@ namespace SdlSharpened.App
             }
 
             _logger.Info($"Loaded map from folder: {_mapFolderPath}");
-        }
-        
-        public void Render(Renderer renderer, Rect camRect)
-        {
-            Rect srcRect = new Rect(0, 0, (int)_tileSize, (int)_tileSize);
-            Rect dstRect = new Rect(0, 0, (int)_tileSize, (int)_tileSize);
-
-            // Calculate start and end X and Y indeces for rendering.
-            int startX = camRect.X / (int)_tileSize;
-            int startY = camRect.Y / (int)_tileSize;
-            // Render whole row/ col if camera size is less than map resolution.
-            // Over render by one tile.
-            // Calcuate how many tiles in view X and Y ways, always round up.
-            int inViewX = (int)Math.Ceiling((double)camRect.W / (double)_tileSize);
-            int inViewY = (int)Math.Ceiling((double)camRect.H / (double)_tileSize);
-            int endX = _scrollsX ? endX = startX + inViewX + 1 : _tilesX;
-            int endY = _scrollsY ? endY = startY + inViewY + 1 : _tilesY;
-
-            for (int y = startY; y < endY; y++)
-            {
-                for (int x = startX; x < endX; x++)
-                {
-                    // TODO: Index OOB exception thrown here when tilemap viewRect is 240x240 and xTiles || yTiles == 8
-                    srcRect = SetSrcRect(_tileGrid[x, y], (int)_tileSize);
-
-                    dstRect.X = _viewRect.X + (x * (int)_tileSize - camRect.X);
-                    dstRect.Y = _viewRect.Y + (y * (int)_tileSize - camRect.Y);
-
-                    // Do not render empty tile.
-                    if (_tileGrid[x, y] > EMPTY_TILE)
-                    {
-                        renderer.Copy(_texture, srcRect, dstRect);
-                    }
-                }
-            }
         }
 
         // Might delete, helps player determine tilemap collision
@@ -327,54 +312,7 @@ namespace SdlSharpened.App
 
             return srcRect;
         }
-
-        // TODO: Get rid of some of these.
-        private Rect TileToWorldRect(Point tilePos) 
-        {
-            return new Rect((tilePos.X * (int)_tileSize) + _viewRect.X, 
-                            (tilePos.Y * (int)_tileSize) + _viewRect.Y, 
-                            (int)_tileSize, (int)_tileSize);
-        }
-
-        // Gets the current XY tile from a world position.
-        private Point PosToTile(Point pos)
-        {
-            return new Point() { X = ((pos.X - _viewRect.X) / (int)_tileSize), Y = ((pos.Y - _viewRect.Y) / (int)_tileSize) };
-        }
-
-        // Gets the XY world position from the current XY tile.
-        public Point TileToPos(Point tile)
-        {
-            return new Point()
-            {
-                X = (tile.X * (int)_tileSize) + _viewRect.X,
-                Y = (tile.Y * (int)_tileSize) + _viewRect.Y
-            };
-        }
-
-        // Used to position player on first tile in map
-        // Returns a point representing the position of the first non-solid tile in the tilemap. Used to place entities.
-        public Point FirstAvailableTile()
-        {
-            var posPoint = new Point(0, 0);
-
-            for (int y = 0; y < _tilesY; y++)
-            {
-                for (int x = 0; x < _tilesX; x++)
-                {
-                    if (_tileGrid[x, y] == 0)
-                    {
-                        posPoint.X = x;
-                        posPoint.Y = y;
-
-                        return posPoint;
-                    }
-                }
-            }
-
-            return posPoint;
-        }
-
+        
         //
         public int GetTileType(Point tile)
         {

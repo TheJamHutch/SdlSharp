@@ -4,35 +4,10 @@ using SDL2;
 namespace SdlSharpened
 {
     /// <summary>
-    ///   Class represents a software surface.
+    ///   A structure that contains a collection of pixels used in software blitting.
     /// </summary>
     public class Surface
     {
-        /// <summary>
-        ///   The width of the surface.
-        /// </summary>
-        public int Width { get { return _width; } }
-
-        /// <summary>
-        ///   The height of the sur
-        /// </summary>
-        public int Height { get { return _height; } }
-
-        /// <summary>
-        ///   The length of a row of pixels in bytes (read-only)
-        /// </summary>
-        public int Pitch { get { return _pitch; } }
-
-        /// <summary>
-        ///   Reference count that can be incremented by the application
-        /// </summary>
-        public int RefCount { get { return _refCount; } set { _refCount = value; } }
-
-        /// <summary>
-        ///   A pointer to the internal SDL_Surface struct.
-        /// </summary>
-        public IntPtr SdlSurface { get { return _sdlSurface; } }
-
         // Private backing fields.
         private int _width;
         private int _height;
@@ -41,8 +16,6 @@ namespace SdlSharpened
 
         // The internal SDL_Surface structure.
         private IntPtr _sdlSurface;
-
-        //private SDL.SDL_Surface _sdlSurface = new SDL.SDL_Surface();
 
         /// <summary>
         ///   Creates a blank surface of specified width and height.
@@ -77,6 +50,31 @@ namespace SdlSharpened
         {
             SDL.SDL_FreeSurface(_sdlSurface);
         }
+
+        /// <summary>
+        ///   The width of the surface.
+        /// </summary>
+        public int Width { get { return _width; } }
+
+        /// <summary>
+        ///   The height of the sur
+        /// </summary>
+        public int Height { get { return _height; } }
+
+        /// <summary>
+        ///   The length of a row of pixels in bytes (read-only)
+        /// </summary>
+        public int Pitch { get { return _pitch; } }
+
+        /// <summary>
+        ///   Reference count that can be incremented by the application
+        /// </summary>
+        public int RefCount { get { return _refCount; } set { _refCount = value; } }
+
+        /// <summary>
+        ///   A pointer to the internal SDL_Surface struct.
+        /// </summary>
+        public IntPtr SdlSurface { get { return _sdlSurface; } }
 
         /// <summary>
         ///   Sets the transparency colour key for the surface.

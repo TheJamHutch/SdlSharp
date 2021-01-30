@@ -19,13 +19,15 @@ namespace SdlSharpened.App
 
             renderer.SetTarget(target);
             renderer.Copy(texture, new Rect(0, 0, 32, 32), new Rect(0, 0, 32, 32));
+            renderer.ResetTarget();
+            renderer.Copy(target, new Rect(0, 0, 32, 32), new Rect(0, 0, 32, 32));
 
             renderer.Present();
         }
 
         static void Main(string[] args)
         {
-            ///DoFirst();
+            //DoFirst();
             //Console.ReadKey();
             //return;
 

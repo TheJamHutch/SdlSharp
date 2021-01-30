@@ -101,10 +101,10 @@ namespace SdlSharpened.App
         // axis if the tilemap cannot scroll that way.
         private void InitLocks() 
         {
-            LockN = (!_tilemap.ScrollsY) || (_worldRect.Y <= _tilemap.WorldRect.Y) ? true : false;
-            LockW = (!_tilemap.ScrollsX) || (_worldRect.X <= _tilemap.WorldRect.Y) ? true : false;
-            LockE = (!_tilemap.ScrollsX) || (_worldRect.X + _worldRect.W <= _tilemap.WorldRect.Y) ? true : false;
-            LockS = (!_tilemap.ScrollsY) || (_worldRect.Y + _worldRect.H <= _tilemap.WorldRect.Y) ? true : false;
+            LockN = (_worldRect.Y <= _tilemap.WorldRect.Y) ? true : false;
+            LockW = (_worldRect.X <= _tilemap.WorldRect.Y) ? true : false;
+            LockE = (_worldRect.X + _worldRect.W <= _tilemap.WorldRect.Y) ? true : false;
+            LockS = (_worldRect.Y + _worldRect.H <= _tilemap.WorldRect.Y) ? true : false;
         }
 
         private bool AllLocked() 
