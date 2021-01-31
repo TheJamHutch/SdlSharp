@@ -121,7 +121,7 @@ namespace SdlSharpened.App
                 {
                     timeDiff = 1;
                 }
-                Timing.Delay((uint)(33 - timeDiff));
+                Timing.Delay((uint)(_frameDelay - timeDiff));
             }
         }
 

@@ -46,7 +46,6 @@ namespace SdlSharpened.App
         // X and Y are where the map starts ( it may be offset), and W and H are the resolution of the tilemap.
         private Rect _worldRect;
 
-        //
         private Dictionary<int, TileEffect> _tileEffectMap;
 
         private Logger _logger;
