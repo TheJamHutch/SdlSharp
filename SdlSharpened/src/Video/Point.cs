@@ -6,7 +6,7 @@ namespace SdlSharpened
     /// <summary>
     ///   Represents a two-dimensional point in space.
     /// </summary>
-    public struct Point
+    public class Point
     {
         internal SDL.SDL_Point SdlPoint { get { return _sdlPoint; } }
 

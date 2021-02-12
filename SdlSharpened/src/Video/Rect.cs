@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿/*  TODO: IntPtr to SDL_Rect
+ */
+using System;
+using System.Runtime.InteropServices;
 using SDL2;
 
 namespace SdlSharpened
@@ -6,7 +9,7 @@ namespace SdlSharpened
     /// <summary>
     ///   A structure that contains the definition of a rectangle, with the origin at the upper left.
     /// </summary>
-    public struct Rect
+    public class Rect
     {
         // The internal SDL_Rect struct.
         private SDL.SDL_Rect _sdlRect;
@@ -34,6 +37,11 @@ namespace SdlSharpened
         {
             _sdlRect = new SDL.SDL_Rect() { x = rect.X, y = rect.Y, w = rect.W, h = rect.H };
         }
+
+        /// <summary>
+        ///   Returns a new instance of <see cref="Rect"/> with all properties initialised to zero.
+        /// </summary>
+        public static Rect Zero { get { return new Rect(0, 0, 0, 0); } }
 
         /// <summary>
         ///   SDL's internal SDL_Rect struct.
