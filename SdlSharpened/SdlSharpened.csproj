@@ -10,7 +10,7 @@
 	  <PackageId>SdlSharpened</PackageId>
 	  <Title>SdlSharpened</Title>
 	  <PackageReleaseNotes>Layer over SDL2-CS.</PackageReleaseNotes>
-	  <Version>0.2.0</Version>
+	  <Version>0.3.0</Version>
 	  <Authors>TheJamHutch</Authors>
 	  <Company>Some Company</Company>
 	  <PackageTags>sdl2</PackageTags>
@@ -19,4 +19,10 @@
 	  <RepositoryUrl>https://github.com/TheJamHutch/SdlSharpened</RepositoryUrl>
 	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\Image\" />
+  </ItemGroup>
 </Project>
