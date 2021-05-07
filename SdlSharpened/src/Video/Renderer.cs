@@ -113,19 +113,14 @@ namespace SdlSharpened
         /// <param name="texture">The texture to copy to the renderer.</param>
         /// <param name="srcRect">Clipping rect.</param>
         /// <param name="dstRect">Positioning rect.</param>
-        public void Copy(Texture texture, Rect? srcRect, Rect dstRect) 
+        public void Copy(Texture texture, Rect srcRect, Rect dstRect) 
         {
+            // TODO: Add Rect.Null (not the same as Rect.Zero) static property to Rect struct definition,
+            //       detect Rect.Null from here and pass srcRect as IntPtr.Zero
+            var src = srcRect.SdlRect;
             var dst = dstRect.SdlRect;
 
-            if (srcRect == null)
-            {
-                SDL.SDL_RenderCopy(_sdlRenderer, texture.SdlTexture, IntPtr.Zero, ref dst);
-            }
-            else 
-            {
-                var src = srcRect.SdlRect;
-                SDL.SDL_RenderCopy(_sdlRenderer, texture.SdlTexture, ref src, ref dst);
-            }
+            SDL.SDL_RenderCopy(_sdlRenderer, texture.SdlTexture, ref src, ref dst);
         }
 
         /// <summary>
@@ -138,20 +133,13 @@ namespace SdlSharpened
         /// <param name="angle">An angle in degrees that indicates the rotation that will be applied to dstrect, rotating it in a clockwise direction.</param>
         /// <param name="centerPoint">A point indicating the point around which dstrect will be rotated (if Point.Zero, rotation will be done around dstrect.w/2, dstrect.h/2)</param>
         /// <param name="rendererFlip">A SDL_RendererFlip value stating which flipping actions should be performed on the texture.</param>
-        public void CopyEx(Texture texture, Rect? srcRect, Rect dstRect, double angle, Point? centerPoint = null, RendererFlip rendererFlip = RendererFlip.FlipNone) 
+        public void CopyEx(Texture texture, Rect srcRect, Rect dstRect, double angle, Point? centerPoint = null, RendererFlip rendererFlip = RendererFlip.FlipNone) 
         {
+            // TODO: Also handle Rect.Null being passed into here
+            var src = new SDL.SDL_Rect() { x = srcRect.X, y = srcRect.Y, w = srcRect.W, h = srcRect.H };
             var dst = new SDL.SDL_Rect() { x = dstRect.X, y = dstRect.Y, w = dstRect.W, h = dstRect.H };
 
-            if (srcRect == null)
-            {
-                SDL.SDL_RenderCopyEx(_sdlRenderer, texture.SdlTexture, IntPtr.Zero, ref dst, angle, IntPtr.Zero, (SDL.SDL_RendererFlip)rendererFlip);
-            }
-            else 
-            {
-                var src = new SDL.SDL_Rect() { x = srcRect.X, y = srcRect.Y, w = srcRect.W, h = srcRect.H };
-                SDL.SDL_RenderCopyEx(_sdlRenderer, texture.SdlTexture, ref src, ref dst, angle, IntPtr.Zero, (SDL.SDL_RendererFlip)rendererFlip);
-            }
-            
+            SDL.SDL_RenderCopyEx(_sdlRenderer, texture.SdlTexture, ref src, ref dst, angle, IntPtr.Zero, (SDL.SDL_RendererFlip)rendererFlip);
         }
 
         /// <summary>
