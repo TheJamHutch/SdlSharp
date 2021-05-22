@@ -26,6 +26,15 @@ namespace SdlSharpened
             SDL.SDL_DestroyRenderer(_sdlRenderer);
         }
 
+        #region Statics
+
+        public bool TargetSupported(Renderer renderer)
+        {
+            return (SDL.SDL_RenderTargetSupported(renderer.SdlRenderer) == SDL.SDL_bool.SDL_TRUE) ? true : false;
+        }
+
+        #endregion
+
         /// <summary>
         ///   A pointer to SDL's internal SDL_Renderer struct.
         /// </summary>
@@ -54,33 +63,32 @@ namespace SdlSharpened
         }
 
         /// <summary>
-        ///   Gets the current renderer draw colour.
+        ///   Get the color used for drawing operations.
         /// </summary>
-        /// <returns>A colour type enum representing the current renderer draw colour.</returns>
-        public ColourType GetDrawColour() 
+        /// <returns>True on success; call SdlSystem.GetError() for more information.</returns>
+        public bool GetDrawColour(out byte r, out byte g, out byte b, out byte a) 
         {
-            SDL.SDL_GetRenderDrawColor(_sdlRenderer, out byte r, out byte g, out byte b, out var a);
+            int success = SDL.SDL_GetRenderDrawColor(_sdlRenderer, out r, out g, out b, out a);
 
-            ColourType colour = ColourType.Black;
-            colour.SetFromBytes(r, g, b);
-
-            return colour;
+            return success == 0 ? true : false;
         }
 
         /// <summary>
         ///   Sets the current draw colour of the renderer.
         /// </summary>
         /// <param name="colour">A colour type enum value.</param>
-        public void SetDrawColour(ColourType colour) 
+        public void SetDrawColour(byte r, byte g, byte b, byte a) 
         {
-            colour.ColourBytes(out var r, out var g, out var b);
-
-            SDL.SDL_SetRenderDrawColor(_sdlRenderer, r, g, b, 0xff);
+            SDL.SDL_SetRenderDrawColor(_sdlRenderer, r, g, b, a);
         }
 
-        public void GetTarget() 
+        public Texture GetTarget() 
         {
-            SDL.SDL_GetRenderTarget(_sdlRenderer);
+            var texture = new Texture(1, 1);
+
+            texture.SdlTexture = SDL.SDL_GetRenderTarget(_sdlRenderer);
+
+            return texture;
         }
 
         /// <summary>
@@ -187,20 +195,6 @@ namespace SdlSharpened
         }
 
         /// <summary>
-        ///   Draws the outline of the given Rect in the specified renderer draw colour.
-        /// </summary>
-        /// <param name="rect">The rect to draw.</param>
-        /// <param name="colour">The colour to draw the rect in.</param>
-        public void DrawRect(Rect rect, ColourType colour)
-        {
-            SDL.SDL_Rect sdlRect = rect.SdlRect;
-            ColourType prevColour = GetDrawColour();
-            SetDrawColour(colour);
-            SDL.SDL_RenderDrawRect(_sdlRenderer, ref sdlRect);
-            SetDrawColour(prevColour);
-        }
-
-        /// <summary>
         ///   Fills the given rect in the current renderer draw colour.
         /// </summary>
         /// <param name="rect">The rect to fill.</param>
@@ -208,20 +202,6 @@ namespace SdlSharpened
         {
             SDL.SDL_Rect sdlRect = rect.SdlRect;
             SDL.SDL_RenderFillRect(_sdlRenderer, ref sdlRect);
-        }
-
-        /// <summary>
-        ///   Fills the given rect in the specified renderer draw colour.
-        /// </summary>
-        /// <param name="rect">The rect to fill.</param>
-        /// <param name="colour">The colour to fill the rect in.</param>
-        public void FillRect(Rect rect, ColourType colour)
-        {
-            SDL.SDL_Rect sdlRect = rect.SdlRect;
-            ColourType prevColour = GetDrawColour();
-            SetDrawColour(colour);
-            SDL.SDL_RenderFillRect(_sdlRenderer, ref sdlRect);
-            SetDrawColour(prevColour);
         }
 
         #endregion
