@@ -8,16 +8,40 @@ namespace SdlSharpened
     /// </summary>
     public static class SdlSystem
     {
-        // Used all over the place
         internal static IntPtr WindowPointer { get; set; }
         internal static IntPtr RendererPointer { get; set; }
 
-        /// <summary>
-        ///   Creates an object representing the SDL system. Must be created before any other SdlSharpened objects.
-        /// </summary>
-        public static void Init()
+        // TODO: Rename to InitEverything ?
+        public static bool Init()
         {
-            SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING);
+            return (SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING) == 0) ? true : false;
+        }
+
+        public static bool Init(uint flags)
+        {
+            return (SDL.SDL_Init(flags) == 0) ? true : false;
+        }
+
+        public static bool Init(params InitFlags[] initFlags)
+        {
+            uint result = 0;
+
+            foreach (var flag in initFlags)
+            {
+                result |= (uint)flag;
+            }
+
+            return (SDL.SDL_Init(result) == 0) ? true : false;
+        }
+
+        public static bool InitSubSystem(InitFlags initFlag)
+        {
+            return (SDL.SDL_InitSubSystem((uint)initFlag) == 0) ? true : false;
+        }
+
+        // TODO
+        public static void WasInit() 
+        {
         }
 
         public static void Quit()
@@ -29,11 +53,11 @@ namespace SdlSharpened
         ///   Delays the SDL system's clock for the specified number of milliseconds.
         /// </summary>
         /// <param name="millis">The number of milliseconds to delay.</param>
-        public static void Delay(int millis)
+        public static void Delay(uint millis)
         {
             if (millis > 0)
             {
-                SDL.SDL_Delay((uint)millis);
+                SDL.SDL_Delay(millis);
             }
         }
 

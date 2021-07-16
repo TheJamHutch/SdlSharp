@@ -20,9 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Eventing\" />
-    <Folder Include="Mixer\" />
-    <Folder Include="Rendering\" />
+    <Folder Include="Events\" />
+    <Folder Include="Audio\" />
   </ItemGroup>
 
 </Project>
