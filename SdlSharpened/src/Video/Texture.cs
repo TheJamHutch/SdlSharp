@@ -3,17 +3,10 @@ using SDL2;
 
 namespace SdlSharpened
 {
-    /// <summary>
-    ///   A structure that contains an efficient, driver-specific representation of pixel data.
-    /// </summary>
     public class Texture
     {
         private IntPtr _sdlTexture;
 
-        /// <summary>
-        ///   Creates a texture from an image file. 24-bit BMP only.
-        /// </summary>
-        /// <param name="filePath">The filepath of the image file.</param>
         public Texture(string filePath)
         {
             var surface = SDL.SDL_LoadBMP(filePath);
@@ -21,10 +14,6 @@ namespace SdlSharpened
             SDL.SDL_FreeSurface(surface);
         }
 
-        /// <summary>
-        ///   Creates a texture from a surface.
-        /// </summary>
-        /// <param name="surface">The surface to create a texture from.</param>
         public Texture(Surface surface) 
         {
             SdlTexture = SDL.SDL_CreateTextureFromSurface(SdlSystem.RendererPointer, surface.SdlSurface);
@@ -40,19 +29,10 @@ namespace SdlSharpened
             SDL.SDL_DestroyTexture(SdlTexture);
         }
 
-        /// <summary>
-        ///   Gets the width, in pixels, of the texture.
-        /// </summary>
         public int Width { get { SDL.SDL_QueryTexture(SdlTexture, out _, out _, out var width, out _); return width; } }
 
-        /// <summary>
-        ///   Gets the height, in pixels, of the texture.
-        /// </summary>
         public int Height { get { SDL.SDL_QueryTexture(SdlTexture, out _, out _, out _, out var height); return height; } }
 
-        /// <summary>
-        ///   Pointer to the internal SDL_Texture structure.
-        /// </summary>
         internal IntPtr SdlTexture { get { return _sdlTexture; } set { _sdlTexture = value; } }
 
         public void Lock(Rect rect) 
@@ -62,9 +42,6 @@ namespace SdlSharpened
             SDL.SDL_LockTexture(_sdlTexture, ref rectCopy, out IntPtr pixels, out int pitch);
         }
 
-        /// <summary>
-        ///   Use this function to unlock a texture, uploading the changes to video memory, if needed.
-        /// </summary>
         public void Unlock() 
         {
             SDL.SDL_UnlockTexture(_sdlTexture);

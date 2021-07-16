@@ -3,47 +3,29 @@ using SDL2;
 
 namespace SdlSharpened
 {
-    /// <summary>
-    ///   Represents a two-dimensional point in space.
-    /// </summary>
     public struct Point
     {
         internal SDL.SDL_Point SdlPoint { get { return _sdlPoint; } }
 
         private SDL.SDL_Point _sdlPoint;
 
-        /// <summary>
-        ///   The X position of the Point.
-        /// </summary>
         public int X
         {
             get { return _sdlPoint.x; }
             set { _sdlPoint.x = value; }
         }
 
-        /// <summary>
-        ///   The Y position of the Point.
-        /// </summary>
         public int Y
         {
             get { return _sdlPoint.y; }
             set { _sdlPoint.y = value; }
         }
 
-        /// <summary>
-        ///   Creates a point with the specified X and Y values.
-        /// </summary>
-        /// <param name="pointX">The X value of the point.</param>
-        /// <param name="pointY">The Y value of the point.</param>
         public Point(int pointX, int pointY)
         {
             _sdlPoint = new SDL.SDL_Point() { x = pointX, y = pointY };
         }
 
-        /// <summary>
-        ///   Creates a new <see cref="Point"> with the same X and Y values as another Point.
-        /// </summary>
-        /// <param name="point">The Point to copy.</param>
         public Point(Point point)
         {
             _sdlPoint = new SDL.SDL_Point() { x = point.X, y = point.Y };

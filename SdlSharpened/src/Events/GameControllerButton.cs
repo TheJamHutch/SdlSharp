@@ -4,10 +4,6 @@ using SDL2;
 
 namespace SdlSharpened
 {
-    /// <summary>
-    ///   Enum of all possible buttons on a typical 360 controller.
-    ///   Direct one-to-one mapping with <see cref="SDL.SDL_GameControllerButton"/> enum.
-    /// </summary>
     public enum GameControllerButton
     {
         Btn_Invalid = -1,

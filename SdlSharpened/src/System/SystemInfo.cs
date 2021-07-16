@@ -7,36 +7,16 @@ namespace SdlSharpened
 {
     public static class SystemInfo
     {
-        /// <summary>
-        ///   Gets the number of CPU cores.
-        /// </summary>
         public static int CoreCount => SDL.SDL_GetCPUCount();
 
-        /// <summary>
-        ///   Gets the cache line size.
-        /// </summary>
         public static int CacheLineSize => SDL.SDL_GetCPUCacheLineSize();
 
-        /// <summary>
-        ///   Gets the installed memory size in megabytes.
-        /// </summary>
         public static int MemoryInstalled => SDL.SDL_GetSystemRAM();
 
-        /// <summary>
-        /// 
-        /// </summary>
         public static string Platform => SDL.SDL_GetPlatform();
 
-        /// <summary>
-        /// 
-        /// </summary>
         public static string PowerStatus => PowerDescription();
 
-
-        /// <summary>
-        ///   Returns a formatted string of all of the system info properties.
-        /// </summary>
-        /// <returns></returns>
         public static string Description() 
         {
             return $"CPU Cores: {CoreCount}\n" +
