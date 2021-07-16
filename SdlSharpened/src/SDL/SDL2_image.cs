@@ -1,7 +1,7 @@
 #region License
 /* SDL2# - C# Wrapper for SDL2
  *
- * Copyright (c) 2013-2020 Ethan Lee.
+ * Copyright (c) 2013-2021 Ethan Lee.
  *
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
@@ -94,7 +94,7 @@ namespace SDL2
 		);
 		public static unsafe IntPtr IMG_Load(string file)
 		{
-			byte* utf8File = SDL.Utf8Encode(file);
+			byte* utf8File = SDL.Utf8EncodeHeap(file);
 			IntPtr handle = INTERNAL_IMG_Load(
 				utf8File
 			);
@@ -142,7 +142,7 @@ namespace SDL2
 			IntPtr renderer,
 			string file
 		) {
-			byte* utf8File = SDL.Utf8Encode(file);
+			byte* utf8File = SDL.Utf8EncodeHeap(file);
 			IntPtr handle = INTERNAL_IMG_LoadTexture(
 				renderer,
 				utf8File
@@ -181,7 +181,7 @@ namespace SDL2
 			int freesrc,
 			string type
 		) {
-			byte* utf8Type = SDL.Utf8Encode(type);
+			byte* utf8Type = SDL.Utf8EncodeHeap(type);
 			IntPtr handle = INTERNAL_IMG_LoadTextureTyped_RW(
 				renderer,
 				src,
@@ -207,7 +207,7 @@ namespace SDL2
 		);
 		public static unsafe int IMG_SavePNG(IntPtr surface, string file)
 		{
-			byte* utf8File = SDL.Utf8Encode(file);
+			byte* utf8File = SDL.Utf8EncodeHeap(file);
 			int result = INTERNAL_IMG_SavePNG(
 				surface,
 				utf8File
@@ -234,7 +234,7 @@ namespace SDL2
 		);
 		public static unsafe int IMG_SaveJPG(IntPtr surface, string file, int quality)
 		{
-			byte* utf8File = SDL.Utf8Encode(file);
+			byte* utf8File = SDL.Utf8EncodeHeap(file);
 			int result = INTERNAL_IMG_SaveJPG(
 				surface,
 				utf8File,
