@@ -6,7 +6,7 @@ namespace SdlSharpened
     /// <summary>
     ///   Represents a two-dimensional point in space.
     /// </summary>
-    public class Point
+    public struct Point
     {
         internal SDL.SDL_Point SdlPoint { get { return _sdlPoint; } }
 
@@ -40,7 +40,10 @@ namespace SdlSharpened
             _sdlPoint = new SDL.SDL_Point() { x = pointX, y = pointY };
         }
 
-        // Copy ctor
+        /// <summary>
+        ///   Creates a new <see cref="Point"> with the same X and Y values as another Point.
+        /// </summary>
+        /// <param name="point">The Point to copy.</param>
         public Point(Point point)
         {
             _sdlPoint = new SDL.SDL_Point() { x = point.X, y = point.Y };

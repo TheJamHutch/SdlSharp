@@ -80,20 +80,18 @@ namespace SdlSharpened
         ///   Sets the transparency colour key for the surface.
         /// </summary>
         /// <param name="tspCol">Colour type enum representing the tranparency colour key.</param>
-        public void SetTransparentColour(ColourType tspCol)
+        public void SetColorKey()
         {
-            SDL.SDL_SetColorKey(_sdlSurface, 1, tspCol.ColourKey());
+            //SDL.SDL_SetColorKey(_sdlSurface, 1, tspCol.ColourKey());
         }
 
         /// <summary>
         ///  Gets the transparency colour key for the surface.
         /// </summary>
         /// <returns>A ColourType enum value.</returns>
-        public ColourType GetTransparentColour()
+        public void GetTransparentColour()
         {
             SDL.SDL_GetColorKey(_sdlSurface, out var key);
-
-            return ColourType.Black;
         }
 
         public bool MustLock() 

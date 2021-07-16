@@ -22,19 +22,6 @@ namespace SdlSharpened
         }
 
         /// <summary>
-        ///   Creates a texture from an image file and sets the transparency colour key.
-        /// </summary>
-        /// <param name="filePath">The filepath of the image file.</param>
-        /// <param name="tspCol">A colour type enum representing the colour to use for transparency.</param>
-        public Texture(string filePath, ColourType tspCol)
-        {
-            var surface = SDL.SDL_LoadBMP(filePath);
-            SDL.SDL_SetColorKey(surface, 1, tspCol.ColourKey());
-            SdlTexture = SDL.SDL_CreateTextureFromSurface(SdlSystem.RendererPointer, surface);
-            SDL.SDL_FreeSurface(surface);
-        }
-
-        /// <summary>
         ///   Creates a texture from a surface.
         /// </summary>
         /// <param name="surface">The surface to create a texture from.</param>
@@ -66,7 +53,7 @@ namespace SdlSharpened
         /// <summary>
         ///   Pointer to the internal SDL_Texture structure.
         /// </summary>
-        public IntPtr SdlTexture { get; }
+        internal IntPtr SdlTexture { get { return _sdlTexture; } set { _sdlTexture = value; } }
 
         public void Lock(Rect rect) 
         {

@@ -9,13 +9,13 @@ namespace SdlSharpened
     /// <summary>
     ///   A structure that contains the definition of a rectangle, with the origin at the upper left.
     /// </summary>
-    public class Rect
+    public struct Rect
     {
         // The internal SDL_Rect struct.
         private SDL.SDL_Rect _sdlRect;
 
         /// <summary>
-        ///   Creates a new Rect of specified position, width, and height.
+        ///   Creates a new <see cref="Rect"/> with specified X, Y, W, H values.
         /// </summary>
         /// <param name="xpos">The pixel X postion of the Rect.</param>
         /// <param name="ypos">The pixel Y postion of the Rect.</param>
@@ -27,12 +27,9 @@ namespace SdlSharpened
         }
 
         /// <summary>
-        ///   Creates a new Rect with the same position and size as another Rect.
+        ///   Creates a new <see cref="Rect"/> with the same position and size as another <see cref="Rect"/>.
         /// </summary>
-        /// <param name="xpos">The pixel X postion of the Rect.</param>
-        /// <param name="ypos">The pixel Y postion of the Rect.</param>
-        /// <param name="width">The pixel width of the Rect.</param>
-        /// <param name="height">The pixel height of the Rect.</param>
+        /// <param name="rect">The Rect to copy.</param>
         public Rect(Rect rect)
         {
             _sdlRect = new SDL.SDL_Rect() { x = rect.X, y = rect.Y, w = rect.W, h = rect.H };

@@ -26,6 +26,15 @@ namespace SdlSharpened
             SDL.SDL_DestroyRenderer(_sdlRenderer);
         }
 
+        #region Statics
+
+        public bool TargetSupported(Renderer renderer)
+        {
+            return (SDL.SDL_RenderTargetSupported(renderer.SdlRenderer) == SDL.SDL_bool.SDL_TRUE) ? true : false;
+        }
+
+        #endregion
+
         /// <summary>
         ///   A pointer to SDL's internal SDL_Renderer struct.
         /// </summary>
@@ -54,33 +63,32 @@ namespace SdlSharpened
         }
 
         /// <summary>
-        ///   Gets the current renderer draw colour.
+        ///   Get the color used for drawing operations.
         /// </summary>
-        /// <returns>A colour type enum representing the current renderer draw colour.</returns>
-        public ColourType GetDrawColour() 
+        /// <returns>True on success; call SdlSystem.GetError() for more information.</returns>
+        public bool GetDrawColour(out byte r, out byte g, out byte b, out byte a) 
         {
-            SDL.SDL_GetRenderDrawColor(_sdlRenderer, out byte r, out byte g, out byte b, out var a);
+            int success = SDL.SDL_GetRenderDrawColor(_sdlRenderer, out r, out g, out b, out a);
 
-            ColourType colour = ColourType.Black;
-            colour.SetFromBytes(r, g, b);
-
-            return colour;
+            return success == 0 ? true : false;
         }
 
         /// <summary>
         ///   Sets the current draw colour of the renderer.
         /// </summary>
         /// <param name="colour">A colour type enum value.</param>
-        public void SetDrawColour(ColourType colour) 
+        public void SetDrawColour(byte r, byte g, byte b, byte a) 
         {
-            colour.ColourBytes(out var r, out var g, out var b);
-
-            SDL.SDL_SetRenderDrawColor(_sdlRenderer, r, g, b, 0xff);
+            SDL.SDL_SetRenderDrawColor(_sdlRenderer, r, g, b, a);
         }
 
-        public void GetTarget() 
+        public Texture GetTarget() 
         {
-            SDL.SDL_GetRenderTarget(_sdlRenderer);
+            var texture = new Texture(1, 1);
+
+            texture.SdlTexture = SDL.SDL_GetRenderTarget(_sdlRenderer);
+
+            return texture;
         }
 
         /// <summary>
@@ -113,19 +121,14 @@ namespace SdlSharpened
         /// <param name="texture">The texture to copy to the renderer.</param>
         /// <param name="srcRect">Clipping rect.</param>
         /// <param name="dstRect">Positioning rect.</param>
-        public void Copy(Texture texture, Rect? srcRect, Rect dstRect) 
+        public void Copy(Texture texture, Rect srcRect, Rect dstRect) 
         {
+            // TODO: Add Rect.Null (not the same as Rect.Zero) static property to Rect struct definition,
+            //       detect Rect.Null from here and pass srcRect as IntPtr.Zero
+            var src = srcRect.SdlRect;
             var dst = dstRect.SdlRect;
 
-            if (srcRect == null)
-            {
-                SDL.SDL_RenderCopy(_sdlRenderer, texture.SdlTexture, IntPtr.Zero, ref dst);
-            }
-            else 
-            {
-                var src = srcRect.SdlRect;
-                SDL.SDL_RenderCopy(_sdlRenderer, texture.SdlTexture, ref src, ref dst);
-            }
+            SDL.SDL_RenderCopy(_sdlRenderer, texture.SdlTexture, ref src, ref dst);
         }
 
         /// <summary>
@@ -138,20 +141,13 @@ namespace SdlSharpened
         /// <param name="angle">An angle in degrees that indicates the rotation that will be applied to dstrect, rotating it in a clockwise direction.</param>
         /// <param name="centerPoint">A point indicating the point around which dstrect will be rotated (if Point.Zero, rotation will be done around dstrect.w/2, dstrect.h/2)</param>
         /// <param name="rendererFlip">A SDL_RendererFlip value stating which flipping actions should be performed on the texture.</param>
-        public void CopyEx(Texture texture, Rect? srcRect, Rect dstRect, double angle, Point? centerPoint = null, RendererFlip rendererFlip = RendererFlip.FlipNone) 
+        public void CopyEx(Texture texture, Rect srcRect, Rect dstRect, double angle, Point? centerPoint = null, RendererFlip rendererFlip = RendererFlip.FlipNone) 
         {
+            // TODO: Also handle Rect.Null being passed into here
+            var src = new SDL.SDL_Rect() { x = srcRect.X, y = srcRect.Y, w = srcRect.W, h = srcRect.H };
             var dst = new SDL.SDL_Rect() { x = dstRect.X, y = dstRect.Y, w = dstRect.W, h = dstRect.H };
 
-            if (srcRect == null)
-            {
-                SDL.SDL_RenderCopyEx(_sdlRenderer, texture.SdlTexture, IntPtr.Zero, ref dst, angle, IntPtr.Zero, (SDL.SDL_RendererFlip)rendererFlip);
-            }
-            else 
-            {
-                var src = new SDL.SDL_Rect() { x = srcRect.X, y = srcRect.Y, w = srcRect.W, h = srcRect.H };
-                SDL.SDL_RenderCopyEx(_sdlRenderer, texture.SdlTexture, ref src, ref dst, angle, IntPtr.Zero, (SDL.SDL_RendererFlip)rendererFlip);
-            }
-            
+            SDL.SDL_RenderCopyEx(_sdlRenderer, texture.SdlTexture, ref src, ref dst, angle, IntPtr.Zero, (SDL.SDL_RendererFlip)rendererFlip);
         }
 
         /// <summary>
@@ -199,20 +195,6 @@ namespace SdlSharpened
         }
 
         /// <summary>
-        ///   Draws the outline of the given Rect in the specified renderer draw colour.
-        /// </summary>
-        /// <param name="rect">The rect to draw.</param>
-        /// <param name="colour">The colour to draw the rect in.</param>
-        public void DrawRect(Rect rect, ColourType colour)
-        {
-            SDL.SDL_Rect sdlRect = rect.SdlRect;
-            ColourType prevColour = GetDrawColour();
-            SetDrawColour(colour);
-            SDL.SDL_RenderDrawRect(_sdlRenderer, ref sdlRect);
-            SetDrawColour(prevColour);
-        }
-
-        /// <summary>
         ///   Fills the given rect in the current renderer draw colour.
         /// </summary>
         /// <param name="rect">The rect to fill.</param>
@@ -220,20 +202,6 @@ namespace SdlSharpened
         {
             SDL.SDL_Rect sdlRect = rect.SdlRect;
             SDL.SDL_RenderFillRect(_sdlRenderer, ref sdlRect);
-        }
-
-        /// <summary>
-        ///   Fills the given rect in the specified renderer draw colour.
-        /// </summary>
-        /// <param name="rect">The rect to fill.</param>
-        /// <param name="colour">The colour to fill the rect in.</param>
-        public void FillRect(Rect rect, ColourType colour)
-        {
-            SDL.SDL_Rect sdlRect = rect.SdlRect;
-            ColourType prevColour = GetDrawColour();
-            SetDrawColour(colour);
-            SDL.SDL_RenderFillRect(_sdlRenderer, ref sdlRect);
-            SetDrawColour(prevColour);
         }
 
         #endregion
