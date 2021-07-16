@@ -3,9 +3,6 @@ using SDL2;
 
 namespace SdlSharpened
 {
-    /// <summary>
-    ///   A structure that contains a collection of pixels used in software blitting.
-    /// </summary>
     public class Surface
     {
         // Private backing fields.
@@ -17,11 +14,6 @@ namespace SdlSharpened
         // The internal SDL_Surface structure.
         private IntPtr _sdlSurface;
 
-        /// <summary>
-        ///   Creates a blank surface of specified width and height.
-        /// </summary>
-        /// <param name="width">The width of the surface in pixels.</param>
-        /// <param name="height">The height of the surface in pixels</param>
         public Surface(int width, int height)
         {
             uint rmask = 0;
@@ -34,11 +26,6 @@ namespace SdlSharpened
             _height = height;
         }
 
-        /// <summary>
-        ///   Loads an image from a file and uses it to create a new surface.
-        ///   BMP, PNG, TIFF and JPG file formats supported.
-        /// </summary>
-        /// <param name="filePath">The path to the image file.</param>
         public Surface(string filePath)
         {
             _sdlSurface = SDL.SDL_LoadBMP(filePath);
@@ -51,44 +38,21 @@ namespace SdlSharpened
             SDL.SDL_FreeSurface(_sdlSurface);
         }
 
-        /// <summary>
-        ///   The width of the surface.
-        /// </summary>
         public int Width { get { return _width; } }
 
-        /// <summary>
-        ///   The height of the sur
-        /// </summary>
         public int Height { get { return _height; } }
 
-        /// <summary>
-        ///   The length of a row of pixels in bytes (read-only)
-        /// </summary>
         public int Pitch { get { return _pitch; } }
 
-        /// <summary>
-        ///   Reference count that can be incremented by the application
-        /// </summary>
         public int RefCount { get { return _refCount; } set { _refCount = value; } }
 
-        /// <summary>
-        ///   A pointer to the internal SDL_Surface struct.
-        /// </summary>
         public IntPtr SdlSurface { get { return _sdlSurface; } }
 
-        /// <summary>
-        ///   Sets the transparency colour key for the surface.
-        /// </summary>
-        /// <param name="tspCol">Colour type enum representing the tranparency colour key.</param>
         public void SetColorKey()
         {
             //SDL.SDL_SetColorKey(_sdlSurface, 1, tspCol.ColourKey());
         }
 
-        /// <summary>
-        ///  Gets the transparency colour key for the surface.
-        /// </summary>
-        /// <returns>A ColourType enum value.</returns>
         public void GetTransparentColour()
         {
             SDL.SDL_GetColorKey(_sdlSurface, out var key);

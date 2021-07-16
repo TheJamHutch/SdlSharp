@@ -4,9 +4,6 @@ using SDL2;
 
 namespace SdlSharpened
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public struct Palette
     {
         public int NumColors { get { return _sdlPalette.ncolors; } }
